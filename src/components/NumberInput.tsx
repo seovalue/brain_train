@@ -7,6 +7,7 @@ interface NumberInputProps {
   format?: { thousand?: boolean; decimals?: number };
   placeholder?: string;
   disabled?: boolean;
+  maxLength?: number;
 }
 
 export const NumberInput: React.FC<NumberInputProps> = ({
@@ -14,7 +15,8 @@ export const NumberInput: React.FC<NumberInputProps> = ({
   onChange,
   format = { thousand: false, decimals: 0 },
   placeholder = "0",
-  disabled = false
+  disabled = false,
+  maxLength
 }) => {
   const [displayValue, setDisplayValue] = useState(value);
 
@@ -24,6 +26,10 @@ export const NumberInput: React.FC<NumberInputProps> = ({
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
+    
+    // maxLength 체크
+    if (maxLength && inputValue.length > maxLength) return;
+    
     const numericValue = inputValue.replace(/[^\d.]/g, '');
     
     // 소수점 처리
@@ -53,6 +59,7 @@ export const NumberInput: React.FC<NumberInputProps> = ({
       placeholder={placeholder}
       disabled={disabled}
       inputMode="decimal"
+      maxLength={maxLength}
     />
   );
 };

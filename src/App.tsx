@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Home } from './routes/Home';
 import { GameDollar } from './routes/GameDollar';
 import { GameArea } from './routes/GameArea';
+import { GameVerification } from './routes/GameVerification';
 import { Result } from './routes/Result';
 import { Settings } from './routes/Settings';
 import './index.css';
@@ -17,6 +18,7 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/game/dollar" element={<GameDollar />} />
             <Route path="/game/area" element={<GameArea />} />
+            <Route path="/game/verification" element={<GameVerification />} />
             <Route path="/result" element={<Result />} />
             <Route path="/settings" element={<Settings />} />
           </Routes>

@@ -24,6 +24,14 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
+  /* 모바일 더블탭 확대 방지 */
+  touch-action: manipulation;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 
 /* iPhone Mini 최적화 컨테이너 */
@@ -66,6 +74,13 @@ body {
   transition: all 0.1s ease;
   min-height: 44px;
   min-width: 44px;
+  /* 모바일 더블탭 확대 방지 */
+  touch-action: manipulation;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 
 .pixel-button:hover {
@@ -149,6 +164,13 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  /* 모바일 더블탭 확대 방지 */
+  touch-action: manipulation;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 
 .game-card:hover {

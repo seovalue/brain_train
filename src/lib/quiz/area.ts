@@ -10,7 +10,7 @@ export function generateAreaQuestions(
   seed: string, 
   difficulty: Difficulty,
   precision: number = 0,
-  questionCount: 3 | 5 | 7 | 10 = 10
+  questionCount: 3 | 5 | 7 | 10 = 5
 ): Question[] {
   const rng = new SeededRNG(seed);
   const questions: Question[] = [];
@@ -52,16 +52,29 @@ export function generateAreaQuestions(
  * 난이도에 따른 평수 생성
  */
 function generatePyeongAmount(rng: SeededRNG, difficulty: Difficulty): number {
+  // 국내에서 가장 많이 나오는 평수들 (제곱미터 기준으로 변환)
+  const commonPyeongValues = [16.7, 17.9, 18.2, 22.4, 25.5, 30.6, 37.6, 40.9];
+  
   switch (difficulty) {
     case "easy":
-      // 1~30 정수 (계산하기 쉬운 값들)
-      return rng.pick([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 15, 18, 20, 24, 25, 30]);
+      // 1~30 정수 (계산하기 쉬운 값들) + 자주 나오는 평수들
+      const easyValues = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 15, 18, 20, 24, 25, 30];
+      // 70% 확률로 자주 나오는 평수, 30% 확률로 일반 값
+      return rng.next() < 0.7 ? rng.pick(commonPyeongValues) : rng.pick(easyValues);
     case "medium":
-      // 5~50, 소수점 1자리
-      return Number((rng.nextInt(5, 50) + rng.next()).toFixed(1));
+      // 5~50, 소수점 1자리 + 자주 나오는 평수들
+      if (rng.next() < 0.6) {
+        return rng.pick(commonPyeongValues);
+      } else {
+        return Number((rng.nextInt(5, 50) + rng.next()).toFixed(1));
+      }
     case "hard":
-      // 1~100, 랜덤 소수
-      return Number((rng.nextInt(1, 100) + rng.next()).toFixed(2));
+      // 1~100, 랜덤 소수 + 자주 나오는 평수들
+      if (rng.next() < 0.5) {
+        return rng.pick(commonPyeongValues);
+      } else {
+        return Number((rng.nextInt(1, 100) + rng.next()).toFixed(2));
+      }
     default:
       return 10;
   }
@@ -71,16 +84,29 @@ function generatePyeongAmount(rng: SeededRNG, difficulty: Difficulty): number {
  * 난이도에 따른 제곱미터 생성
  */
 function generateSqmAmount(rng: SeededRNG, difficulty: Difficulty): number {
+  // 국내에서 가장 많이 나오는 제곱미터 값들
+  const commonSqmValues = [55, 59, 60, 74, 84, 101, 124, 135];
+  
   switch (difficulty) {
     case "easy":
-      // 3~99 (1~30평에 해당하는 계산하기 쉬운 값들)
-      return rng.pick([3, 6, 9, 12, 15, 18, 21, 24, 27, 30, 33, 36, 39, 42, 45, 48, 51, 54, 57, 60, 63, 66, 69, 72, 75, 78, 81, 84, 87, 90, 93, 96, 99]);
+      // 3~99 (1~30평에 해당하는 계산하기 쉬운 값들) + 자주 나오는 제곱미터
+      const easyValues = [3, 6, 9, 12, 15, 18, 21, 24, 27, 30, 33, 36, 39, 42, 45, 48, 51, 54, 57, 60, 63, 66, 69, 72, 75, 78, 81, 84, 87, 90, 93, 96, 99];
+      // 70% 확률로 자주 나오는 제곱미터, 30% 확률로 일반 값
+      return rng.next() < 0.7 ? rng.pick(commonSqmValues) : rng.pick(easyValues);
     case "medium":
-      // 16~165 (5~50평에 해당), 소수점 1자리
-      return Number((rng.nextInt(16, 165) + rng.next()).toFixed(1));
+      // 16~165 (5~50평에 해당), 소수점 1자리 + 자주 나오는 제곱미터
+      if (rng.next() < 0.6) {
+        return rng.pick(commonSqmValues);
+      } else {
+        return Number((rng.nextInt(16, 165) + rng.next()).toFixed(1));
+      }
     case "hard":
-      // 3~330 (1~100평에 해당), 랜덤 소수
-      return Number((rng.nextInt(3, 330) + rng.next()).toFixed(2));
+      // 3~330 (1~100평에 해당), 랜덤 소수 + 자주 나오는 제곱미터
+      if (rng.next() < 0.5) {
+        return rng.pick(commonSqmValues);
+      } else {
+        return Number((rng.nextInt(3, 330) + rng.next()).toFixed(2));
+      }
     default:
       return 33;
   }

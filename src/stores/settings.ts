@@ -13,7 +13,7 @@ const defaultSettings: Settings = {
   exchangeRate: 1400,
   difficulty: "easy",
   uiMode: "grid",
-  questionCount: 10
+  questionCount: 5
 };
 
 export const useSettingsStore = create<SettingsStore>()(

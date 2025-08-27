@@ -31,7 +31,7 @@ export const Keypad: React.FC<KeypadProps> = ({
         className="pixel-button text-lg"
         onClick={onClear}
       >
-        ⌫
+        지우기
       </button>
       
       <button
@@ -46,7 +46,7 @@ export const Keypad: React.FC<KeypadProps> = ({
         onClick={onSubmit}
         disabled={submitDisabled}
       >
-        ✓
+        제출
       </button>
     </div>
   );

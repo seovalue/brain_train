@@ -8,7 +8,7 @@ export function generateDollarQuestions(
   seed: string, 
   exchangeRate: number, 
   difficulty: Difficulty,
-  questionCount: 3 | 5 | 7 | 10 = 10
+  questionCount: 3 | 5 | 7 | 10 = 5
 ): Question[] {
   const rng = new SeededRNG(seed);
   const questions: Question[] = [];

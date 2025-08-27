@@ -30,19 +30,18 @@ export const Home: React.FC = () => {
       disabled: false
     },
     {
-      id: 'coming1',
-      icon: '🧮',
-      title: '수학 퀴즈',
-      description: '곧 출시 예정!',
-      path: '',
-      disabled: true,
-      comingSoon: true
+      id: 'verification',
+      icon: '📱',
+      title: '인증번호 기억하기',
+      description: '6자리 숫자 외우기',
+      path: '/game/verification',
+      disabled: false
     },
     {
-      id: 'coming2',
-      icon: '🎯',
-      title: '기억력 게임',
-      description: '준비 중...',
+      id: 'coming1',
+      icon: '🧮',
+      title: '새로운 퀴즈',
+      description: '곧 출시 예정!',
       path: '',
       disabled: true,
       comingSoon: true

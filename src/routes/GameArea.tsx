@@ -118,6 +118,8 @@ export const GameArea: React.FC = () => {
   return (
     <div className="min-h-screen flex items-center justify-center p-2">
       <div className="w-full max-w-[335px] h-[680px] flex flex-col">
+      <p></p>
+      <p></p>
         {/* 헤더 */}
         <div className="mb-2 flex-shrink-0">
           <button

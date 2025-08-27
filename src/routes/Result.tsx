@@ -80,6 +80,19 @@ export const Result: React.FC = () => {
             홈으로
           </button>
         </div>
+
+        {/* 설정 진입점 */}
+        <div className="mt-6 sm:mt-8 md:mt-10 text-center">
+          <p className="text-xs sm:text-sm text-console-fg/70 mb-3 sm:mb-4">
+            더 많은 퀴즈를 풀고 싶다면?
+          </p>
+          <button
+            className="pixel-button px-4 sm:px-6 md:px-8 py-2 sm:py-3 md:py-4 text-xs sm:text-sm md:text-base"
+            onClick={() => navigate('/settings')}
+          >
+            설정하기
+          </button>
+        </div>
       </div>
     </div>
   );

@@ -1,6 +1,6 @@
 export type Difficulty = "easy" | "medium" | "hard";
 
-export type QuestionType = "USD_TO_KRW" | "PYEONG_TO_SQM" | "SQM_TO_PYEONG";
+export type QuestionType = "USD_TO_KRW" | "PYEONG_TO_SQM" | "SQM_TO_PYEONG" | "VERIFICATION_CODE";
 
 export type Question = {
   id: string;
