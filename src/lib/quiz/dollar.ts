@@ -7,12 +7,13 @@ import { SeededRNG } from '../rng';
 export function generateDollarQuestions(
   seed: string, 
   exchangeRate: number, 
-  difficulty: Difficulty
+  difficulty: Difficulty,
+  questionCount: 5 | 10 = 10
 ): Question[] {
   const rng = new SeededRNG(seed);
   const questions: Question[] = [];
 
-  for (let i = 0; i < 10; i++) {
+  for (let i = 0; i < questionCount; i++) {
     const dollarAmount = generateDollarAmount(rng, difficulty);
     const answer = Math.round(dollarAmount * exchangeRate);
 
@@ -35,8 +36,8 @@ export function generateDollarQuestions(
 function generateDollarAmount(rng: SeededRNG, difficulty: Difficulty): number {
   switch (difficulty) {
     case "easy":
-      // 5~100, 5단위
-      return rng.pick([5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100]);
+      // 10~100, 10의 배수 (계산하기 쉬운 값들)
+      return rng.pick([10, 20, 30, 40, 50, 60, 70, 80, 90, 100]);
     case "medium":
       // 20~400, 10단위
       return rng.pick([20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200, 210, 220, 230, 240, 250, 260, 270, 280, 290, 300, 310, 320, 330, 340, 350, 360, 370, 380, 390, 400]);

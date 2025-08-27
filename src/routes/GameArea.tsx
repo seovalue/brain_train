@@ -26,7 +26,7 @@ function getAreaTolerance(answer: number, difficulty: Difficulty): number {
   
   switch (difficulty) {
     case "easy":
-      return 1; // 쉬운 난이도는 ±1 허용
+      return 2; // 쉬운 난이도는 ±2 허용 (소수점 입력 불필요)
     case "medium":
       return decimalPlaces >= 1 ? 0.5 : 1; // 소수점 1자리 이상이면 ±0.5, 아니면 ±1
     case "hard":
@@ -38,7 +38,7 @@ function getAreaTolerance(answer: number, difficulty: Difficulty): number {
 
 export const GameArea: React.FC = () => {
   const navigate = useNavigate();
-  const { difficulty } = useSettingsStore();
+  const { difficulty, questionCount } = useSettingsStore();
   const { 
     questions, 
     currentQuestionIndex, 
@@ -60,10 +60,10 @@ export const GameArea: React.FC = () => {
     if (questions.length === 0 || gameType !== 'area') {
       const today = getTodayString();
       const seed = generateSeed(today, difficulty);
-      const newQuestions = generateAreaQuestions(seed, difficulty, 1); // 기본값 1자리 소수점
+      const newQuestions = generateAreaQuestions(seed, difficulty, 1, questionCount); // 기본값 1자리 소수점
       startQuiz(newQuestions, 'area');
     }
-  }, [questions.length, gameType, difficulty, startQuiz]);
+  }, [questions.length, gameType, difficulty, questionCount, startQuiz]);
 
   const currentQ = questions[currentQuestionIndex];
 
@@ -101,7 +101,7 @@ export const GameArea: React.FC = () => {
       setShowFeedback(false);
       setInputValue('');
       
-      if (currentQuestionIndex < questions.length - 1) {
+      if (currentQuestionIndex < questionCount - 1) {
         nextQuestion();
       } else {
         // 게임 종료
@@ -135,14 +135,23 @@ export const GameArea: React.FC = () => {
               1평 = 3.3㎡
             </span>
           </div>
+          
+          {/* 쉬운 난이도 가이드 */}
+          {difficulty === "easy" && (
+            <div className="mb-2 p-2 bg-console-green/10 border border-console-green/20 rounded text-center">
+              <span className="text-xs text-console-green">
+                💡 정수만 입력해도 돼요.
+              </span>
+            </div>
+          )}
           <p></p>
           
           <div className="flex justify-between items-center mb-2">
-            <span className="text-sm">문제 {currentQuestionIndex + 1}/10</span>
+            <span className="text-sm">문제 {currentQuestionIndex + 1}/{questionCount}</span>
             <span className="text-xs">점수: {score}</span>
           </div>
           
-          <ProgressBar current={currentQuestionIndex + 1} total={10} />
+          <ProgressBar current={currentQuestionIndex + 1} total={questionCount} />
         </div>
 
         {/* 문제 */}

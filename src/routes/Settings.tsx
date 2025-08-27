@@ -9,14 +9,21 @@ export const Settings: React.FC = () => {
   const {
     exchangeRate,
     difficulty,
+    questionCount,
     setExchangeRate,
-    setDifficulty
+    setDifficulty,
+    setQuestionCount
   } = useSettingsStore();
 
   const difficulties: { value: Difficulty; label: string }[] = [
     { value: 'easy', label: '하' },
     { value: 'medium', label: '중' },
     { value: 'hard', label: '상' }
+  ];
+
+  const questionCounts: { value: 5 | 10; label: string }[] = [
+    { value: 5, label: '5개' },
+    { value: 10, label: '10개' }
   ];
 
   return (
@@ -49,7 +56,31 @@ export const Settings: React.FC = () => {
           </div>
         </div>
       </ConsoleWindow>
-      <p></p>
+
+      {/* 문제 개수 설정 */}
+      <ConsoleWindow title="문제 개수 설정" className="mb-6 sm:mb-8 md:mb-10">
+        <div className="space-y-4 sm:space-y-6 md:space-y-8 p-4 sm:p-6 md:p-8">
+          <div>
+            <label className="block text-xs sm:text-sm mb-3 sm:mb-4 md:mb-5">게임당 문제 개수</label>
+            <div className="flex gap-3 sm:gap-4 md:gap-5">
+              {questionCounts.map((count) => (
+                <button
+                  key={count.value}
+                  className={`pixel-button flex-1 text-xs sm:text-sm md:text-base py-3 sm:py-4 md:py-5 transition-all duration-200 ${
+                    questionCount === count.value 
+                      ? 'bg-console-blue text-console-bg border-console-blue shadow-lg transform scale-105' 
+                      : 'hover:border-console-blue'
+                  }`}
+                  onClick={() => setQuestionCount(count.value)}
+                >
+                  {count.label}
+                </button>
+              ))}
+            </div>
+            <p className="text-xs text-console-fg/70 mt-2">현재 설정: {questionCount}개</p>
+          </div>
+        </div>
+      </ConsoleWindow>
 
       {/* 난이도 설정 */}
       <ConsoleWindow title="난이도 설정" className="mb-8 sm:mb-10 md:mb-12">
@@ -75,9 +106,6 @@ export const Settings: React.FC = () => {
           </div>
         </div>
       </ConsoleWindow>
-      <p></p>
-
-
 
       {/* 저장 완료 메시지 */}
       <div className="text-center text-xs sm:text-sm text-console-fg/70 mt-6 sm:mt-8 md:mt-10">

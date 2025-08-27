@@ -6,12 +6,14 @@ interface SettingsStore extends Settings {
   setExchangeRate: (rate: number) => void;
   setDifficulty: (difficulty: Difficulty) => void;
   setUiMode: (mode: "grid" | "menu") => void;
+  setQuestionCount: (count: 5 | 10) => void;
 }
 
 const defaultSettings: Settings = {
   exchangeRate: 1400,
-  difficulty: "medium",
-  uiMode: "grid"
+  difficulty: "easy",
+  uiMode: "grid",
+  questionCount: 10
 };
 
 export const useSettingsStore = create<SettingsStore>()(
@@ -25,10 +27,11 @@ export const useSettingsStore = create<SettingsStore>()(
       setDifficulty: (difficulty: Difficulty) => 
         set({ difficulty }),
       
-
-      
       setUiMode: (mode: "grid" | "menu") => 
         set({ uiMode: mode }),
+      
+      setQuestionCount: (count: 5 | 10) => 
+        set({ questionCount: count }),
     }),
     {
       name: 'brain-train-settings',

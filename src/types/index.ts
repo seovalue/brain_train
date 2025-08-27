@@ -26,6 +26,7 @@ export type Settings = {
   exchangeRate: number;
   difficulty: Difficulty;
   uiMode: "grid" | "menu";
+  questionCount: 5 | 10;
 };
 
 export type DailyQuizState = {

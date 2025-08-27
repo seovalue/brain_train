@@ -13,7 +13,7 @@ import { parseNumber } from '../lib/format';
 
 export const GameDollar: React.FC = () => {
   const navigate = useNavigate();
-  const { exchangeRate, difficulty } = useSettingsStore();
+  const { exchangeRate, difficulty, questionCount } = useSettingsStore();
   const { 
     questions, 
     currentQuestionIndex, 
@@ -35,10 +35,10 @@ export const GameDollar: React.FC = () => {
     if (questions.length === 0 || gameType !== 'dollar') {
       const today = getTodayString();
       const seed = generateSeed(today, difficulty);
-      const newQuestions = generateDollarQuestions(seed, exchangeRate, difficulty);
+      const newQuestions = generateDollarQuestions(seed, exchangeRate, difficulty, questionCount);
       startQuiz(newQuestions, 'dollar');
     }
-  }, [questions.length, gameType, exchangeRate, difficulty, startQuiz]);
+  }, [questions.length, gameType, exchangeRate, difficulty, questionCount, startQuiz]);
 
   const currentQ = questions[currentQuestionIndex];
 
@@ -74,7 +74,7 @@ export const GameDollar: React.FC = () => {
       setShowFeedback(false);
       setInputValue('');
       
-      if (currentQuestionIndex < questions.length - 1) {
+      if (currentQuestionIndex < questionCount - 1) {
         nextQuestion();
       } else {
         // 게임 종료
@@ -108,14 +108,23 @@ export const GameDollar: React.FC = () => {
               1달러 = {exchangeRate.toLocaleString()}원
             </span>
           </div>
+          
+          {/* 쉬운 난이도 가이드 */}
+          {difficulty === "easy" && (
+            <div className="mb-2 p-2 bg-console-green/10 border border-console-green/20 rounded text-center">
+              <span className="text-xs text-console-green">
+                💡 자신감을 가져요! 
+              </span>
+            </div>
+          )}
           <p></p>
           
           <div className="flex justify-between items-center mb-2">
-            <span className="text-sm">문제 {currentQuestionIndex + 1}/10</span>
+            <span className="text-sm">문제 {currentQuestionIndex + 1}/{questionCount}</span>
             <span className="text-xs">점수: {score}</span>
           </div>
           
-          <ProgressBar current={currentQuestionIndex + 1} total={10} />
+          <ProgressBar current={currentQuestionIndex + 1} total={questionCount} />
         </div>
 
         {/* 문제 */}

@@ -9,12 +9,13 @@ const PYEONG_TO_SQM_RATIO = 3.3;
 export function generateAreaQuestions(
   seed: string, 
   difficulty: Difficulty,
-  precision: number = 0
+  precision: number = 0,
+  questionCount: 5 | 10 = 10
 ): Question[] {
   const rng = new SeededRNG(seed);
   const questions: Question[] = [];
 
-  for (let i = 0; i < 10; i++) {
+  for (let i = 0; i < questionCount; i++) {
     const isPyeongToSqm = rng.next() > 0.5;
     
     if (isPyeongToSqm) {
@@ -27,7 +28,7 @@ export function generateAreaQuestions(
         prompt: `${pyeongAmount}평 = ?㎡`,
         icon: "📏",
         answer: Number(answer.toFixed(precision)),
-        format: { decimals: precision }
+        format: { decimals: difficulty === "easy" ? 0 : precision }
       });
     } else {
       const sqmAmount = generateSqmAmount(rng, difficulty);
@@ -39,7 +40,7 @@ export function generateAreaQuestions(
         prompt: `${sqmAmount}㎡ = ?평`,
         icon: "📏",
         answer: Number(answer.toFixed(precision)),
-        format: { decimals: precision }
+        format: { decimals: difficulty === "easy" ? 0 : precision }
       });
     }
   }
@@ -53,8 +54,8 @@ export function generateAreaQuestions(
 function generatePyeongAmount(rng: SeededRNG, difficulty: Difficulty): number {
   switch (difficulty) {
     case "easy":
-      // 1~20 정수
-      return rng.nextInt(1, 20);
+      // 1~30 정수 (계산하기 쉬운 값들)
+      return rng.pick([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 15, 18, 20, 24, 25, 30]);
     case "medium":
       // 5~50, 소수점 1자리
       return Number((rng.nextInt(5, 50) + rng.next()).toFixed(1));
@@ -72,8 +73,8 @@ function generatePyeongAmount(rng: SeededRNG, difficulty: Difficulty): number {
 function generateSqmAmount(rng: SeededRNG, difficulty: Difficulty): number {
   switch (difficulty) {
     case "easy":
-      // 3~66 (1~20평에 해당)
-      return rng.nextInt(3, 66);
+      // 3~99 (1~30평에 해당하는 계산하기 쉬운 값들)
+      return rng.pick([3, 6, 9, 12, 15, 18, 21, 24, 27, 30, 33, 36, 39, 42, 45, 48, 51, 54, 57, 60, 63, 66, 69, 72, 75, 78, 81, 84, 87, 90, 93, 96, 99]);
     case "medium":
       // 16~165 (5~50평에 해당), 소수점 1자리
       return Number((rng.nextInt(16, 165) + rng.next()).toFixed(1));
