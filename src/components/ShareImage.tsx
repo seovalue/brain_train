@@ -9,13 +9,13 @@ interface ShareImageProps {
 
 export const ShareImage = forwardRef<HTMLDivElement, ShareImageProps>(({ result, score, gameType }, ref) => {
   const isReactionGame = gameType === 'reaction';
+  const averageReactionTime = result.averageReactionTime || 0;
   
   const getScoreMessage = (score: number) => {
     if (isReactionGame) {
-      const avgTime = result.correct / result.total;
-      if (avgTime < 0.3) return "⚡ 놀라운 반응속도!";
-      if (avgTime < 0.5) return "👍 빠른 반응속도!";
-      if (avgTime < 0.8) return "😊 보통 반응속도";
+      if (averageReactionTime < 0.2) return "⚡ 놀라운 반응속도!";
+      if (averageReactionTime < 0.3) return "👍 빠른 반응속도!";
+      if (averageReactionTime < 0.5) return "😊 보통 반응속도";
       return "💪 더 연습해보세요!";
     } else {
       if (score >= 90) return "🎉 완벽합니다!";
@@ -56,7 +56,7 @@ export const ShareImage = forwardRef<HTMLDivElement, ShareImageProps>(({ result,
             }}
           >
             {isReactionGame 
-              ? `${(result.correct / result.total).toFixed(3)}초` 
+              ? `${averageReactionTime.toFixed(3)}초` 
               : `${score}점`
             }
           </div>
@@ -70,7 +70,7 @@ export const ShareImage = forwardRef<HTMLDivElement, ShareImageProps>(({ result,
               <span>{isReactionGame ? '평균 반응속도:' : '맞춘 개수:'}</span>
               <span className="font-bold text-[#88FF88]">
                 {isReactionGame 
-                  ? `${(result.correct / result.total).toFixed(3)}초` 
+                  ? `${averageReactionTime.toFixed(3)}초` 
                   : `${result.correct}/${result.total}`
                 }
               </span>

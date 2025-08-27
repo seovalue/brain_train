@@ -13,6 +13,7 @@ interface DailyQuizState {
   questions: Question[];
   currentQuestion: Question | null;
   gameType: string | null;
+  reactionTimes: number[]; // 반응속도 게임용
 }
 
 interface DailyQuizStore extends DailyQuizState {
@@ -34,6 +35,7 @@ const defaultState: DailyQuizState = {
   questions: [],
   currentQuestion: null,
   gameType: null,
+  reactionTimes: [],
 };
 
 export const useDailyQuizStore = create<DailyQuizStore>()(
@@ -55,11 +57,12 @@ export const useDailyQuizStore = create<DailyQuizStore>()(
           endTime: undefined,
           currentQuestion: questions[0] || null,
           gameType,
+          reactionTimes: gameType === 'reaction' ? [] : [],
         });
       },
       
       submitAnswer: (answer: number, isCorrect?: boolean) => {
-        const { questions, currentQuestionIndex, answers, score } = get();
+        const { questions, currentQuestionIndex, answers, score, gameType, reactionTimes } = get();
         
         if (currentQuestionIndex >= questions.length) return;
         
@@ -71,9 +74,16 @@ export const useDailyQuizStore = create<DailyQuizStore>()(
         const newAnswers = [...answers];
         newAnswers[currentQuestionIndex] = answer;
         
+        // 반응속도 게임의 경우 반응시간을 별도로 저장
+        let newReactionTimes = reactionTimes;
+        if (gameType === 'reaction') {
+          newReactionTimes = [...reactionTimes, answer];
+        }
+        
         set({
           answers: newAnswers,
           score: score + (correct ? 1 : 0),
+          reactionTimes: newReactionTimes,
         });
       },
       
@@ -90,19 +100,17 @@ export const useDailyQuizStore = create<DailyQuizStore>()(
       },
       
       finishQuiz: () => {
-        const { answers, score, startTime, gameType } = get();
+        const { answers, score, startTime, gameType, reactionTimes } = get();
         const endTimeNow = Date.now();
         
         set({ endTime: endTimeNow });
         
         // 반응속도 게임의 경우 평균 반응속도를 계산
         let finalScore = score;
-        if (gameType === 'reaction') {
-          const validAnswers = answers.filter(answer => answer !== null) as number[];
-          if (validAnswers.length > 0) {
-            const averageTime = validAnswers.reduce((sum, time) => sum + time, 0) / validAnswers.length;
-            finalScore = averageTime; // 평균 반응속도를 score로 사용
-          }
+        let averageReactionTime = 0;
+        if (gameType === 'reaction' && reactionTimes.length > 0) {
+          averageReactionTime = reactionTimes.reduce((sum, time) => sum + time, 0) / reactionTimes.length;
+          finalScore = reactionTimes.length; // 맞춘 개수는 전체 문제 수
         }
         
         const result: GameResult = {
@@ -111,6 +119,8 @@ export const useDailyQuizStore = create<DailyQuizStore>()(
           total: answers.length,
           correct: finalScore,
           ms: endTimeNow - (startTime || endTimeNow),
+          reactionTimes: gameType === 'reaction' ? reactionTimes : undefined,
+          averageReactionTime: gameType === 'reaction' ? averageReactionTime : undefined,
         };
         
         // Save streak
@@ -134,6 +144,7 @@ export const useDailyQuizStore = create<DailyQuizStore>()(
         score: state.score,
         startTime: state.startTime,
         endTime: state.endTime,
+        reactionTimes: state.reactionTimes,
       }),
     }
   )

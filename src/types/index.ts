@@ -21,6 +21,8 @@ export type GameResult = {
   total: number;
   correct: number;
   ms?: number;
+  reactionTimes?: number[]; // 반응속도 게임의 각 문제별 반응시간
+  averageReactionTime?: number; // 반응속도 게임의 평균 반응시간
 };
 
 export type Settings = {

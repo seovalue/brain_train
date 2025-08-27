@@ -24,12 +24,22 @@ export const Result: React.FC = () => {
   
   // 반응속도 게임인지 확인 (gameType이 'reaction'인 경우)
   const isReactionGame = location.state?.gameType === 'reaction';
+  
+  // 반응속도 게임의 경우 평균 반응속도 사용
+  const averageReactionTime = result.averageReactionTime || 0;
 
   const getScoreMessage = (score: number) => {
     if (score >= 90) return "🎉 완벽합니다!";
     if (score >= 70) return "👍 잘했어요!";
     if (score >= 50) return "😊 괜찮아요!";
     return "💪 다음엔 더 잘할 수 있어요!";
+  };
+
+  const getReactionScoreMessage = (avgTime: number) => {
+    if (avgTime < 0.2) return "⚡ 놀라운 반응속도!";
+    if (avgTime < 0.3) return "👍 빠른 반응속도!";
+    if (avgTime < 0.5) return "😊 보통 반응속도";
+    return "💪 더 연습해보세요!";
   };
 
   const handleImageShare = async () => {
@@ -98,7 +108,7 @@ export const Result: React.FC = () => {
                 className="pixel-button w-full text-xs sm:text-sm md:text-base py-3 sm:py-4"
                 onClick={() => {
                   const shareText = isReactionGame 
-                    ? `반응속도 테스트 결과 평균 ${(result.correct / result.total).toFixed(3)}초를 기록했습니다!\n${result.total}번의 테스트를 완료했어요.\n당신도 반응속도를 테스트해보세요!⚡\n\nhttps://brain-train-ing.vercel.app/`
+                    ? `반응속도 테스트 결과 평균 ${averageReactionTime.toFixed(3)}초를 기록했습니다!\n${result.total}번의 테스트를 완료했어요.\n당신도 반응속도를 테스트해보세요!⚡\n\nhttps://brain-train-ing.vercel.app/`
                     : `두뇌를 수련한 결과 ${score}점을 획득했습니다!\n${result.correct}/${result.total} 문제를 맞췄어요.\n당신도 꾸준히 수련해보세요.🧠\n\nhttps://brain-train-ing.vercel.app/`;
                   navigator.clipboard.writeText(shareText);
                   alert('공유 텍스트가 클립보드에 복사되었습니다!');
@@ -132,13 +142,11 @@ export const Result: React.FC = () => {
                 fontWeight: '900'
               }}
             >
-              {isReactionGame ? `${(result.correct / result.total).toFixed(3)}초` : `${score}점`}
+              {isReactionGame ? `${averageReactionTime.toFixed(3)}초` : `${score}점`}
             </div>
             <p className="text-sm sm:text-base md:text-lg">
               {isReactionGame 
-                ? (result.correct / result.total < 0.3 ? '⚡ 놀라운 반응속도!' : 
-                   result.correct / result.total < 0.5 ? '👍 빠른 반응속도!' : 
-                   result.correct / result.total < 0.8 ? '😊 보통 반응속도' : '💪 더 연습해보세요!')
+                ? getReactionScoreMessage(averageReactionTime)
                 : getScoreMessage(score)
               }
             </p>
@@ -151,7 +159,7 @@ export const Result: React.FC = () => {
                 <span>{isReactionGame ? '평균 반응속도:' : '맞춘 개수:'}</span>
                 <span className="font-bold">
                   {isReactionGame 
-                    ? `${(result.correct / result.total).toFixed(3)}초` 
+                    ? `${averageReactionTime.toFixed(3)}초` 
                     : `${result.correct}/${result.total}`
                   }
                 </span>
