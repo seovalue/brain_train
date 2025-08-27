@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Analytics } from '@vercel/analytics/react';
 import { Home } from './routes/Home';
 import { GameDollar } from './routes/GameDollar';
 import { GameArea } from './routes/GameArea';
@@ -28,6 +29,7 @@ function App() {
           </Routes>
         </div>
       </div>
+      <Analytics />
     </Router>
   );
 }

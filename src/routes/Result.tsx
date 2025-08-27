@@ -1,5 +1,6 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { track } from '@vercel/analytics';
 import html2canvas from 'html2canvas';
 import type { GameResult } from '../types';
 import { ShareImage } from '../components/ShareImage';
@@ -27,6 +28,19 @@ export const Result: React.FC = () => {
   
   // 반응속도 게임의 경우 평균 반응속도 사용
   const averageReactionTime = result.averageReactionTime || 0;
+
+  // 게임 완료 이벤트 추적
+  useEffect(() => {
+    if (result) {
+      track('game_completed', {
+        gameType: location.state?.gameType || 'unknown',
+        score: isReactionGame ? averageReactionTime : Math.round((result.correct / result.total) * 100),
+        totalQuestions: result.total,
+        correctAnswers: result.correct,
+        timeSpent: result.ms ? Math.floor(result.ms / 1000) : 0,
+      });
+    }
+  }, [result, location.state?.gameType, isReactionGame, averageReactionTime]);
 
   const getScoreMessage = (score: number) => {
     if (score >= 90) return "🎉 완벽합니다!";
@@ -181,7 +195,13 @@ export const Result: React.FC = () => {
             
             <button
               className="pixel-button w-full text-xs sm:text-sm md:text-base py-3 sm:py-4 md:py-5"
-              onClick={handleImageShare}
+              onClick={() => {
+                track('result_shared', {
+                  gameType: location.state?.gameType || 'unknown',
+                  score: isReactionGame ? averageReactionTime : Math.round((result.correct / result.total) * 100),
+                });
+                handleImageShare();
+              }}
             >
               🖼️ 결과 공유하기
             </button>

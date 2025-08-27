@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { track } from '@vercel/analytics';
 import { GameCard } from '../components/GameCard';
 import { useSettingsStore } from '../stores/settings';
 
@@ -92,7 +93,15 @@ export const Home: React.FC = () => {
             icon={game.icon}
             title={game.title}
             description={game.description}
-            onClick={() => !game.disabled && navigate(game.path)}
+            onClick={() => {
+              if (!game.disabled) {
+                track('game_started', {
+                  gameType: game.id,
+                  gameTitle: game.title,
+                });
+                navigate(game.path);
+              }
+            }}
             disabled={game.disabled}
             comingSoon={game.comingSoon}
             difficulty={game.difficulty}
