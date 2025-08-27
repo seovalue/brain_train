@@ -1,6 +1,6 @@
 export type Difficulty = "easy" | "medium" | "hard";
 
-export type QuestionType = "USD_TO_KRW" | "PYEONG_TO_SQM" | "SQM_TO_PYEONG" | "VERIFICATION_CODE";
+export type QuestionType = "USD_TO_KRW" | "PYEONG_TO_SQM" | "SQM_TO_PYEONG" | "VERIFICATION_CODE" | "DREAM_GRANDFATHER";
 
 export type Question = {
   id: string;
@@ -8,6 +8,7 @@ export type Question = {
   prompt: string;
   icon?: string;
   answer: number;
+  originalNumbers?: number[]; // 원본 숫자 배열 (DREAM_GRANDFATHER 타입용)
   format?: { 
     decimals?: number; 
     thousand?: boolean;

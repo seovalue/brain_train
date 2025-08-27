@@ -12,7 +12,7 @@ export default defineConfig({
       manifest: {
         name: '두뇌수련',
         short_name: '두뇌수련',
-        description: '콘솔 게임 스타일 두뇌 훈련 앱',
+        description: '두뇌를 수련하십시오.',
         theme_color: '#1C1C2A',
         background_color: '#1C1C2A',
         display: 'standalone',

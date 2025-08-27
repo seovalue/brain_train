@@ -7,6 +7,7 @@ interface GameCardProps {
   onClick: () => void;
   disabled?: boolean;
   comingSoon?: boolean;
+  difficulty?: 'easy' | 'medium' | 'hard';
 }
 
 export const GameCard: React.FC<GameCardProps> = ({
@@ -15,15 +16,24 @@ export const GameCard: React.FC<GameCardProps> = ({
   description,
   onClick,
   disabled = false,
-  comingSoon = false
+  comingSoon = false,
+  difficulty
 }) => {
   return (
     <div 
       className={`game-card flex-shrink-0 ${disabled ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer'} ${comingSoon ? 'coming-soon' : ''}`}
       onClick={disabled ? undefined : onClick}
     >
-      <div className="text-2xl sm:text-3xl mb-2 sm:mb-3">{icon}</div>
-      <h3 className="text-xs sm:text-sm font-bold mb-2 sm:mb-3">{title}</h3>
+      <div className="text-2xl sm:text-3xl mb-2 sm:mb-3">
+        {difficulty === 'hard' ? (
+          <div className="bg-red-600 text-white text-xs px-2 py-1 rounded font-bold border border-red-700 shadow-sm" style={{backgroundColor: '#dc2626', color: 'white'}}>
+            고난이도
+          </div>
+        ) : (
+          icon
+        )}
+      </div>
+      <h3 className="text-xs sm:text-sm font-bold mb-0.5 sm:mb-1 whitespace-pre-line">{title}</h3>
       <p className="text-xs text-console-fg/70 mb-3 sm:mb-4 leading-tight">{description}</p>
       
       {comingSoon ? (
