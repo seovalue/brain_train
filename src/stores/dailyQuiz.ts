@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { Question, GameResult } from '../types';
 import { generateSeed, getTodayString } from '../lib/rng';
+import { calculateGameResult, submitGameAnswer } from '../lib/gameCalculators';
 
 interface DailyQuizState {
   seed: string;
@@ -68,22 +69,22 @@ export const useDailyQuizStore = create<DailyQuizStore>()(
         
         const question = questions[currentQuestionIndex];
         
-        // isCorrect가 제공되지 않은 경우 기본 판정 로직 사용
-        const correct = isCorrect !== undefined ? isCorrect : Math.abs(answer - question.answer) < 0.01;
-        
-        const newAnswers = [...answers];
-        newAnswers[currentQuestionIndex] = answer;
-        
-        // 반응속도 게임의 경우 반응시간을 별도로 저장
-        let newReactionTimes = reactionTimes;
-        if (gameType === 'reaction') {
-          newReactionTimes = [...reactionTimes, answer];
-        }
+        // 게임 타입별 답변 제출 로직
+        const result = submitGameAnswer(
+          gameType || 'default',
+          answers,
+          score,
+          currentQuestionIndex,
+          answer,
+          question,
+          reactionTimes,
+          isCorrect
+        );
         
         set({
-          answers: newAnswers,
-          score: score + (correct ? 1 : 0),
-          reactionTimes: newReactionTimes,
+          answers: result.newAnswers,
+          score: result.newScore,
+          reactionTimes: result.newReactionTimes || reactionTimes,
         });
       },
       
@@ -102,26 +103,13 @@ export const useDailyQuizStore = create<DailyQuizStore>()(
       finishQuiz: () => {
         const { answers, score, startTime, gameType, reactionTimes } = get();
         const endTimeNow = Date.now();
+        const totalTime = endTimeNow - (startTime || endTimeNow);
         
         set({ endTime: endTimeNow });
         
-        // 반응속도 게임의 경우 평균 반응속도를 계산
-        let finalScore = score;
-        let averageReactionTime = 0;
-        if (gameType === 'reaction' && reactionTimes.length > 0) {
-          averageReactionTime = reactionTimes.reduce((sum, time) => sum + time, 0) / reactionTimes.length;
-          finalScore = reactionTimes.length; // 맞춘 개수는 전체 문제 수
-        }
-        
-        const result: GameResult = {
-          date: getTodayString(),
-          difficulty: 'medium', // TODO: get from settings
-          total: answers.length,
-          correct: finalScore,
-          ms: endTimeNow - (startTime || endTimeNow),
-          reactionTimes: gameType === 'reaction' ? reactionTimes : undefined,
-          averageReactionTime: gameType === 'reaction' ? averageReactionTime : undefined,
-        };
+        // 게임 타입별 결과 계산
+        const result = calculateGameResult(gameType || 'default', answers, score, reactionTimes, totalTime);
+        result.date = getTodayString(); // 날짜 설정
         
         // Save streak
         saveStreak(result);

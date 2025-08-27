@@ -68,9 +68,6 @@ export const GameReaction: React.FC = () => {
   // 버튼 클릭 핸들러
   const handleButtonClick = useCallback(() => {
     if (gameState === 'ready') {
-      // 즉시 상태를 변경하여 버튼을 숨김
-      setGameState('feedback');
-      
       const endTime = Date.now();
       const time = (endTime - startTime) / 1000; // 초 단위로 변환
       
@@ -91,7 +88,10 @@ export const GameReaction: React.FC = () => {
       }
       
       setFeedbackMessage(`${message}\n${time.toFixed(3)}초 걸렸습니다.`);
+      
+      // 즉시 피드백을 표시하여 버튼을 숨김
       setShowFeedback(true);
+      setGameState('feedback');
       
       // 정답 제출 (반응속도 게임에서는 시간이 점수)
       submitAnswer(time, true);
@@ -187,7 +187,7 @@ export const GameReaction: React.FC = () => {
             )}
             
             {/* 클릭 버튼 */}
-            {gameState === 'ready' && (
+            {gameState === 'ready' && !showFeedback && (
               <div className="mb-4">
                 <button
                   className="pixel-button bg-console-accent text-console-bg font-bold shadow-lg"
