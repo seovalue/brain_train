@@ -12,7 +12,7 @@ export const FeedbackBadge: React.FC<FeedbackBadgeProps> = ({
   className = ''
 }) => {
   return (
-    <div className={`feedback-badge ${isCorrect ? 'feedback-correct' : 'feedback-wrong'} ${className}`}>
+    <div className={`feedback-badge ${isCorrect ? 'feedback-correct' : 'feedback-wrong'} ${className} whitespace-pre-line`}>
       {message}
     </div>
   );

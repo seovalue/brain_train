@@ -56,13 +56,12 @@ export const Home: React.FC = () => {
       difficulty: 'hard'
     },
     {
-      id: 'coming1',
-      icon: '🧮',
-      title: '준비중',
-      description: '곧 출시 예정!',
-      path: '',
-      disabled: true,
-      comingSoon: true
+      id: 'reaction',
+      icon: '⚡',
+      title: '뱅샐 유전자검사 대비 훈련장',
+      description: '3,2,1... 클릭!',
+      path: '/game/reaction',
+      disabled: false
     },
     {
       id: 'coming2',

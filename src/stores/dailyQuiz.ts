@@ -90,16 +90,26 @@ export const useDailyQuizStore = create<DailyQuizStore>()(
       },
       
       finishQuiz: () => {
-        const { answers, score, startTime } = get();
+        const { answers, score, startTime, gameType } = get();
         const endTimeNow = Date.now();
         
         set({ endTime: endTimeNow });
+        
+        // 반응속도 게임의 경우 평균 반응속도를 계산
+        let finalScore = score;
+        if (gameType === 'reaction') {
+          const validAnswers = answers.filter(answer => answer !== null) as number[];
+          if (validAnswers.length > 0) {
+            const averageTime = validAnswers.reduce((sum, time) => sum + time, 0) / validAnswers.length;
+            finalScore = averageTime; // 평균 반응속도를 score로 사용
+          }
+        }
         
         const result: GameResult = {
           date: getTodayString(),
           difficulty: 'medium', // TODO: get from settings
           total: answers.length,
-          correct: score,
+          correct: finalScore,
           ms: endTimeNow - (startTime || endTimeNow),
         };
         

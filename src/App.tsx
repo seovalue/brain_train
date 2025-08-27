@@ -4,6 +4,7 @@ import { GameDollar } from './routes/GameDollar';
 import { GameArea } from './routes/GameArea';
 import { GameVerification } from './routes/GameVerification';
 import { GameDream } from './routes/GameDream';
+import { GameReaction } from './routes/GameReaction';
 import { Result } from './routes/Result';
 import { Settings } from './routes/Settings';
 import './index.css';
@@ -21,6 +22,7 @@ function App() {
             <Route path="/game/area" element={<GameArea />} />
             <Route path="/game/verification" element={<GameVerification />} />
             <Route path="/game/dream" element={<GameDream />} />
+            <Route path="/game/reaction" element={<GameReaction />} />
             <Route path="/result" element={<Result />} />
             <Route path="/settings" element={<Settings />} />
           </Routes>

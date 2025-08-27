@@ -21,6 +21,9 @@ export const Result: React.FC = () => {
   const timeInSeconds = result.ms ? Math.floor(result.ms / 1000) : 0;
   const minutes = Math.floor(timeInSeconds / 60);
   const seconds = timeInSeconds % 60;
+  
+  // 반응속도 게임인지 확인 (gameType이 'reaction'인 경우)
+  const isReactionGame = location.state?.gameType === 'reaction';
 
   const getScoreMessage = (score: number) => {
     if (score >= 90) return "🎉 완벽합니다!";
@@ -55,7 +58,7 @@ export const Result: React.FC = () => {
     <>
       {/* 공유용 이미지 (숨김) */}
       <div style={{ position: 'absolute', left: '-9999px', top: '-9999px' }}>
-        <ShareImage ref={shareImageRef} result={result} score={score} />
+        <ShareImage ref={shareImageRef} result={result} score={score} gameType={location.state?.gameType} />
       </div>
 
       {/* 이미지 공유 모달 */}
@@ -94,7 +97,9 @@ export const Result: React.FC = () => {
               <button
                 className="pixel-button w-full text-xs sm:text-sm md:text-base py-3 sm:py-4"
                 onClick={() => {
-                  const shareText = `두뇌를 수련한 결과 ${score}점을 획득했습니다!\n${result.correct}/${result.total} 문제를 맞췄어요.\n당신도 꾸준히 수련해보세요.🧠\n\nhttps://brain-train-ing.vercel.app/`;
+                  const shareText = isReactionGame 
+                    ? `반응속도 테스트 결과 평균 ${(result.correct / result.total).toFixed(3)}초를 기록했습니다!\n${result.total}번의 테스트를 완료했어요.\n당신도 반응속도를 테스트해보세요!⚡\n\nhttps://brain-train-ing.vercel.app/`
+                    : `두뇌를 수련한 결과 ${score}점을 획득했습니다!\n${result.correct}/${result.total} 문제를 맞췄어요.\n당신도 꾸준히 수련해보세요.🧠\n\nhttps://brain-train-ing.vercel.app/`;
                   navigator.clipboard.writeText(shareText);
                   alert('공유 텍스트가 클립보드에 복사되었습니다!');
                 }}
@@ -117,25 +122,39 @@ export const Result: React.FC = () => {
         <div className="w-full max-w-md">
           {/* 결과 헤더 */}
           <div className="text-center mb-6 sm:mb-8 md:mb-12">
-            <h1 className="text-lg sm:text-xl md:text-2xl font-bold mb-2 sm:mb-3 md:mb-4">오늘의 점수</h1>
+            <h1 className="text-lg sm:text-xl md:text-2xl font-bold mb-2 sm:mb-3 md:mb-4">
+              {isReactionGame ? '반응속도 결과' : '오늘의 점수'}
+            </h1>
             <div 
               className="font-black text-console-green mb-3 sm:mb-4 md:mb-6 tracking-wider drop-shadow-lg"
               style={{ 
-                fontSize: 'clamp(2rem, 8vw, 4rem)',
+                fontSize: isReactionGame ? 'clamp(1.5rem, 6vw, 2.5rem)' : 'clamp(2rem, 8vw, 4rem)',
                 fontWeight: '900'
               }}
             >
-              {score}점
+              {isReactionGame ? `${(result.correct / result.total).toFixed(3)}초` : `${score}점`}
             </div>
-            <p className="text-sm sm:text-base md:text-lg">{getScoreMessage(score)}</p>
+            <p className="text-sm sm:text-base md:text-lg">
+              {isReactionGame 
+                ? (result.correct / result.total < 0.3 ? '⚡ 놀라운 반응속도!' : 
+                   result.correct / result.total < 0.5 ? '👍 빠른 반응속도!' : 
+                   result.correct / result.total < 0.8 ? '😊 보통 반응속도' : '💪 더 연습해보세요!')
+                : getScoreMessage(score)
+              }
+            </p>
           </div>
 
           {/* 상세 결과 */}
           <div className="console-window mb-6 sm:mb-8 md:mb-12" style={{ padding: '2rem' }}>
             <div className="space-y-3 sm:space-y-4 md:space-y-6">
               <div className="flex justify-between items-center text-xs sm:text-sm md:text-base">
-                <span>맞춘 개수:</span>
-                <span className="font-bold">{result.correct}/{result.total}</span>
+                <span>{isReactionGame ? '평균 반응속도:' : '맞춘 개수:'}</span>
+                <span className="font-bold">
+                  {isReactionGame 
+                    ? `${(result.correct / result.total).toFixed(3)}초` 
+                    : `${result.correct}/${result.total}`
+                  }
+                </span>
               </div>
               
               {result.ms && (
@@ -161,16 +180,6 @@ export const Result: React.FC = () => {
             
             <button
               className="pixel-button w-full text-xs sm:text-sm md:text-base py-3 sm:py-4 md:py-5"
-              onClick={() => {
-                // 퀴즈 재시작
-                navigate('/');
-              }}
-            >
-              다시 풀기
-            </button>
-            
-            <button
-              className="pixel-button w-full text-xs sm:text-sm md:text-base py-3 sm:py-4 md:py-5"
               onClick={() => navigate('/')}
             >
               홈으로
@@ -178,6 +187,7 @@ export const Result: React.FC = () => {
           </div>
 
           {/* 설정 진입점 */}
+          {!isReactionGame && 
           <div className="mt-6 sm:mt-8 md:mt-10 text-center">
             <p className="text-xs sm:text-sm text-console-fg/70 mb-3 sm:mb-4">
               퀴즈 개수를 늘리고 싶다면?
@@ -189,6 +199,7 @@ export const Result: React.FC = () => {
               설정하기
             </button>
           </div>
+          }
         </div>
       </div>
     </>
