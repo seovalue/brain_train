@@ -46,6 +46,15 @@ export function generateSeed(date: string, difficulty: string): string {
 }
 
 /**
+ * 더 세밀한 시드 생성 (시간과 문제 인덱스 포함)
+ */
+export function generateDetailedSeed(date: string, difficulty: string, questionIndex: number, gameType: string): string {
+  const hour = new Date().getHours();
+  const minute = Math.floor(new Date().getMinutes() / 10) * 10; // 10분 단위로 그룹화
+  return `${date}_${difficulty}_${gameType}_${hour}_${minute}_${questionIndex}`;
+}
+
+/**
  * 오늘 날짜 문자열 생성 (YYYY-MM-DD)
  */
 export function getTodayString(): string {

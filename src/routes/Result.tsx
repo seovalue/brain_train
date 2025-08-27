@@ -1,11 +1,16 @@
-import React from 'react';
+import React, { useRef, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import html2canvas from 'html2canvas';
 import type { GameResult } from '../types';
+import { ShareImage } from '../components/ShareImage';
 
 export const Result: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const result = location.state?.result as GameResult;
+  const shareImageRef = useRef<HTMLDivElement>(null);
+  const [showPreview, setShowPreview] = useState(false);
+  const [previewImage, setPreviewImage] = useState<string>('');
 
   if (!result) {
     navigate('/');
@@ -24,76 +29,168 @@ export const Result: React.FC = () => {
     return "💪 다음엔 더 잘할 수 있어요!";
   };
 
+  const handleImageShare = async () => {
+    if (!shareImageRef.current) return;
+
+    try {
+      const canvas = await html2canvas(shareImageRef.current, {
+        width: 1200,
+        height: 1200,
+        scale: 1,
+        backgroundColor: '#1C1C2A',
+        useCORS: true,
+        allowTaint: true
+      });
+
+      const imageUrl = canvas.toDataURL('image/png');
+      setPreviewImage(imageUrl);
+      setShowPreview(true);
+    } catch (error) {
+      console.error('이미지 생성 실패:', error);
+      alert('이미지 생성에 실패했습니다.');
+    }
+  };
+
   return (
-    <div className="min-h-screen flex items-center justify-center p-3 sm:p-4 md:p-6">
-      <div className="w-full max-w-md">
-        {/* 결과 헤더 */}
-        <div className="text-center mb-6 sm:mb-8 md:mb-12">
-          <h1 className="text-lg sm:text-xl md:text-2xl font-bold mb-2 sm:mb-3 md:mb-4">오늘의 점수</h1>
-          <div 
-            className="font-black text-console-green mb-3 sm:mb-4 md:mb-6 tracking-wider drop-shadow-lg"
-            style={{ 
-              fontSize: 'clamp(2rem, 8vw, 4rem)',
-              fontWeight: '900'
-            }}
-          >
-            {score}점
-          </div>
-          <p className="text-sm sm:text-base md:text-lg">{getScoreMessage(score)}</p>
-        </div>
+    <>
+      {/* 공유용 이미지 (숨김) */}
+      <div style={{ position: 'absolute', left: '-9999px', top: '-9999px' }}>
+        <ShareImage ref={shareImageRef} result={result} score={score} />
+      </div>
 
-        {/* 상세 결과 */}
-        <div className="console-window mb-6 sm:mb-8 md:mb-12" style={{ padding: '2rem' }}>
-          <div className="space-y-3 sm:space-y-4 md:space-y-6">
-            <div className="flex justify-between items-center text-xs sm:text-sm md:text-base">
-              <span>맞춘 개수:</span>
-              <span className="font-bold">{result.correct}/{result.total}</span>
+      {/* 이미지 공유 모달 */}
+      {showPreview && (
+        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-3 sm:p-4 md:p-6">
+          <div className="console-window max-w-full max-h-full overflow-auto" style={{ padding: '2rem' }}>
+            {/* 모달 헤더 */}
+            <div className="flex justify-between items-center mb-4 sm:mb-6">
+              <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-console-green">이미지 공유하기</h3>
             </div>
-            
-            {result.ms && (
-              <div className="flex justify-between items-center text-xs sm:text-sm md:text-base">
-                <span>소요 시간:</span>
-                <span className="font-bold">
-                  {minutes}분 {seconds}초
-                </span>
-              </div>
-            )}
+
+            {/* 이미지 표시 */}
+            <div className="mb-4 sm:mb-6">
+              <img 
+                src={previewImage} 
+                alt="공유 이미지" 
+                className="max-w-full h-auto border-4 border-console-green"
+                style={{ maxHeight: '60vh' }}
+              />
+            </div>
+
+            {/* 액션 버튼들 */}
+            <div className="space-y-3 sm:space-y-4">
+              <button
+                className="pixel-button w-full text-xs sm:text-sm md:text-base py-3 sm:py-4"
+                onClick={() => {
+                  const link = document.createElement('a');
+                  link.download = `두뇌수련-${score}점-${new Date().toISOString().split('T')[0]}.png`;
+                  link.href = previewImage;
+                  link.click();
+                }}
+              >
+                💾 이미지 다운로드
+              </button>
+              
+              <button
+                className="pixel-button w-full text-xs sm:text-sm md:text-base py-3 sm:py-4"
+                onClick={() => {
+                  const shareText = `두뇌를 수련한 결과 ${score}점을 획득했습니다!\n${result.correct}/${result.total} 문제를 맞췄어요.\n당신도 꾸준히 수련해보세요.🧠\n\nhttps://brain-train-ing.vercel.app/`;
+                  navigator.clipboard.writeText(shareText);
+                  alert('공유 텍스트가 클립보드에 복사되었습니다!');
+                }}
+              >
+                📋 공유 텍스트 복사
+              </button>
+              
+              <button
+                className="pixel-button w-full text-xs sm:text-sm md:text-base py-3 sm:py-4"
+                onClick={() => setShowPreview(false)}
+              >
+                닫기
+              </button>
+            </div>
           </div>
         </div>
+      )}
 
-        {/* 액션 버튼 */}
-        <div className="space-y-3 sm:space-y-4 md:space-y-6">
-          <button
-            className="pixel-button w-full text-xs sm:text-sm md:text-base py-3 sm:py-4 md:py-5"
-            onClick={() => {
-              // 퀴즈 재시작
-              navigate('/');
-            }}
-          >
-            다시 풀기
-          </button>
-          
-          <button
-            className="pixel-button w-full text-xs sm:text-sm md:text-base py-3 sm:py-4 md:py-5"
-            onClick={() => navigate('/')}
-          >
-            홈으로
-          </button>
-        </div>
+      <div className="min-h-screen flex items-center justify-center p-3 sm:p-4 md:p-6">
+        <div className="w-full max-w-md">
+          {/* 결과 헤더 */}
+          <div className="text-center mb-6 sm:mb-8 md:mb-12">
+            <h1 className="text-lg sm:text-xl md:text-2xl font-bold mb-2 sm:mb-3 md:mb-4">오늘의 점수</h1>
+            <div 
+              className="font-black text-console-green mb-3 sm:mb-4 md:mb-6 tracking-wider drop-shadow-lg"
+              style={{ 
+                fontSize: 'clamp(2rem, 8vw, 4rem)',
+                fontWeight: '900'
+              }}
+            >
+              {score}점
+            </div>
+            <p className="text-sm sm:text-base md:text-lg">{getScoreMessage(score)}</p>
+          </div>
 
-        {/* 설정 진입점 */}
-        <div className="mt-6 sm:mt-8 md:mt-10 text-center">
-          <p className="text-xs sm:text-sm text-console-fg/70 mb-3 sm:mb-4">
-            더 많은 퀴즈를 풀고 싶다면?
-          </p>
-          <button
-            className="pixel-button px-4 sm:px-6 md:px-8 py-2 sm:py-3 md:py-4 text-xs sm:text-sm md:text-base"
-            onClick={() => navigate('/settings')}
-          >
-            설정하기
-          </button>
+          {/* 상세 결과 */}
+          <div className="console-window mb-6 sm:mb-8 md:mb-12" style={{ padding: '2rem' }}>
+            <div className="space-y-3 sm:space-y-4 md:space-y-6">
+              <div className="flex justify-between items-center text-xs sm:text-sm md:text-base">
+                <span>맞춘 개수:</span>
+                <span className="font-bold">{result.correct}/{result.total}</span>
+              </div>
+              
+              {result.ms && (
+                <div className="flex justify-between items-center text-xs sm:text-sm md:text-base">
+                  <span>소요 시간:</span>
+                  <span className="font-bold">
+                    {minutes}분 {seconds}초
+                  </span>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* 액션 버튼 */}
+          <div className="space-y-3 sm:space-y-4 md:space-y-6">
+            
+            <button
+              className="pixel-button w-full text-xs sm:text-sm md:text-base py-3 sm:py-4 md:py-5"
+              onClick={handleImageShare}
+            >
+              🖼️ 결과 공유하기
+            </button>
+            
+            <button
+              className="pixel-button w-full text-xs sm:text-sm md:text-base py-3 sm:py-4 md:py-5"
+              onClick={() => {
+                // 퀴즈 재시작
+                navigate('/');
+              }}
+            >
+              다시 풀기
+            </button>
+            
+            <button
+              className="pixel-button w-full text-xs sm:text-sm md:text-base py-3 sm:py-4 md:py-5"
+              onClick={() => navigate('/')}
+            >
+              홈으로
+            </button>
+          </div>
+
+          {/* 설정 진입점 */}
+          <div className="mt-6 sm:mt-8 md:mt-10 text-center">
+            <p className="text-xs sm:text-sm text-console-fg/70 mb-3 sm:mb-4">
+              퀴즈 개수를 늘리고 싶다면?
+            </p>
+            <button
+              className="pixel-button px-4 sm:px-6 md:px-8 py-2 sm:py-3 md:py-4 text-xs sm:text-sm md:text-base"
+              onClick={() => navigate('/settings')}
+            >
+              설정하기
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
