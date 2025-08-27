@@ -1,0 +1,297 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --console-bg: #1C1C2A;
+  --console-fg: #E0E0E0;
+  --console-red: #FF5555;
+  --console-green: #88FF88;
+  --console-blue: #5599FF;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Press Start 2P', monospace;
+  background-color: var(--console-bg);
+  color: var(--console-fg);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+/* iPhone Mini 최적화 컨테이너 */
+.iphone-mini-container {
+  max-width: 375px;
+  max-height: 667px;
+  margin: 0 auto;
+  min-height: 100vh;
+  background-color: var(--console-bg);
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+/* 355px x 700px 최적화 컨테이너 */
+.container-355x700 {
+  max-width: 355px;
+  max-height: 700px;
+  margin: 0 auto;
+  min-height: 100vh;
+  background-color: var(--console-bg);
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+/* 콘솔 윈도우 스타일 */
+.console-window {
+  border: 3px solid var(--console-fg);
+  background-color: var(--console-bg);
+  box-shadow: 
+    inset 2px 2px 0 rgba(255, 255, 255, 0.1),
+    inset -2px -2px 0 rgba(0, 0, 0, 0.3);
+}
+
+/* 픽셀 버튼 스타일 */
+.pixel-button {
+  border: 2px solid var(--console-fg);
+  background-color: var(--console-bg);
+  color: var(--console-fg);
+  font-family: 'Press Start 2P', monospace;
+  transition: all 0.1s ease;
+  min-height: 44px;
+  min-width: 44px;
+}
+
+.pixel-button:hover {
+  background-color: var(--console-fg);
+  color: var(--console-bg);
+}
+
+.pixel-button:active {
+  transform: translateY(2px);
+  box-shadow: inset 2px 2px 0 rgba(0, 0, 0, 0.3);
+}
+
+.pixel-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* 키패드 스타일 */
+.keypad-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  max-width: 280px;
+  margin: 0 auto;
+}
+
+/* 입력창 스타일 */
+.number-input {
+  border: 3px solid var(--console-fg);
+  background-color: var(--console-bg);
+  color: var(--console-fg);
+  font-family: 'Press Start 2P', monospace;
+  text-align: center;
+  padding: 12px;
+  font-size: 1.2rem;
+  min-height: 60px;
+}
+
+/* 진행바 스타일 */
+.progress-bar {
+  background-color: rgba(224, 224, 224, 0.2);
+  border: 2px solid var(--console-fg);
+  height: 20px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  background-color: var(--console-green);
+  height: 100%;
+  transition: width 0.3s ease;
+}
+
+/* 피드백 배지 */
+.feedback-badge {
+  border: 2px solid;
+  padding: 8px 16px;
+  font-size: 0.8rem;
+  text-align: center;
+  margin: 16px 0;
+}
+
+.feedback-correct {
+  border-color: var(--console-green);
+  color: var(--console-green);
+}
+
+.feedback-wrong {
+  border-color: var(--console-red);
+  color: var(--console-red);
+}
+
+/* 게임 카드 스타일 */
+.game-card {
+  border: 3px solid var(--console-fg);
+  background-color: var(--console-bg);
+  padding: 16px;
+  text-align: center;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  min-height: 140px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.game-card:hover {
+  border-color: var(--console-green);
+  transform: translateY(-2px);
+}
+
+.game-card.coming-soon {
+  border-color: #888888;
+  opacity: 0.8;
+}
+
+.game-card.coming-soon:hover {
+  transform: none;
+  border-color: #888888;
+}
+
+/* 픽셀 마스코트 */
+.pixel-mascot {
+  width: 80px;
+  height: 80px;
+  background-color: var(--console-fg);
+  border-radius: 50%;
+  margin: 0 auto 20px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pixel-mascot::before {
+  content: '🧠';
+  font-size: 2rem;
+}
+
+/* 모바일 최적화 */
+@media (max-width: 768px) {
+  .keypad-grid {
+    max-width: 260px;
+  }
+  
+  .pixel-button {
+    font-size: 0.9rem;
+    min-height: 48px;
+  }
+  
+  .number-input {
+    font-size: 1rem;
+    min-height: 56px;
+  }
+  
+  .game-card {
+    min-height: 120px;
+    padding: 12px;
+  }
+}
+
+/* 355px 최적화 */
+@media (max-width: 355px) {
+  .keypad-grid {
+    max-width: 220px;
+    gap: 5px;
+  }
+  
+  .pixel-button {
+    font-size: 0.75rem;
+    min-height: 42px;
+  }
+  
+  .number-input {
+    font-size: 0.85rem;
+    padding: 8px;
+    min-height: 50px;
+  }
+  
+  .game-card {
+    min-height: 100px;
+    padding: 8px;
+  }
+  
+  .pixel-mascot {
+    width: 65px;
+    height: 65px;
+  }
+  
+  .pixel-mascot::before {
+    font-size: 1.4rem;
+  }
+}
+
+/* iPhone Mini 최적화 (375px 이하) */
+@media (max-width: 375px) {
+  .keypad-grid {
+    max-width: 240px;
+    gap: 6px;
+  }
+  
+  .pixel-button {
+    font-size: 0.8rem;
+    min-height: 44px;
+  }
+  
+  .number-input {
+    font-size: 0.9rem;
+    padding: 10px;
+    min-height: 52px;
+  }
+  
+  .game-card {
+    min-height: 110px;
+    padding: 10px;
+  }
+  
+  .pixel-mascot {
+    width: 70px;
+    height: 70px;
+  }
+  
+  .pixel-mascot::before {
+    font-size: 1.5rem;
+  }
+}
+
+/* 매우 작은 화면 최적화 (320px 이하) */
+@media (max-width: 320px) {
+  .keypad-grid {
+    max-width: 220px;
+    gap: 4px;
+  }
+  
+  .pixel-button {
+    font-size: 0.7rem;
+    min-height: 40px;
+  }
+  
+  .number-input {
+    font-size: 0.8rem;
+    padding: 8px;
+    min-height: 48px;
+  }
+  
+  .game-card {
+    min-height: 100px;
+    padding: 8px;
+  }
+}

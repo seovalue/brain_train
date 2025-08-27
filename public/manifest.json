@@ -1,0 +1,10 @@
+{
+  "name": "두뇌수련",
+  "short_name": "두뇌수련",
+  "description": "콘솔 게임 스타일 두뇌 훈련 앱",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1C1C2A",
+  "theme_color": "#1C1C2A",
+  "orientation": "portrait"
+}

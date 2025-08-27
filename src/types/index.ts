@@ -1,0 +1,38 @@
+export type Difficulty = "easy" | "medium" | "hard";
+
+export type QuestionType = "USD_TO_KRW" | "PYEONG_TO_SQM" | "SQM_TO_PYEONG";
+
+export type Question = {
+  id: string;
+  type: QuestionType;
+  prompt: string;
+  icon?: string;
+  answer: number;
+  format?: { 
+    decimals?: number; 
+    thousand?: boolean;
+  };
+};
+
+export type GameResult = {
+  date: string;
+  difficulty: Difficulty;
+  total: number;
+  correct: number;
+  ms?: number;
+};
+
+export type Settings = {
+  exchangeRate: number;
+  difficulty: Difficulty;
+  uiMode: "grid" | "menu";
+};
+
+export type DailyQuizState = {
+  seed: string;
+  currentQuestion: number;
+  answers: (number | null)[];
+  score: number;
+  startTime?: number;
+  endTime?: number;
+};

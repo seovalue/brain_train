@@ -1,0 +1,176 @@
+---
+description:
+globs:
+alwaysApply: true
+---
+
+# title: Brain Training – Console UI MVP (Requirements)
+# applies_to: ["**/*"]
+# description: Classic console-game styled mobile webapp. No sound/vibration.
+# tags: ["frontend", "react", "typescript", "tailwind", "pwa", "console-ui"]
+
+## Role
+You are a senior frontend engineer. Build the **“두뇌수련”** mobile-first webapp (MVP) in
+**TypeScript + React + Vite + Tailwind** with a **classic console game UI**.  
+The experience is exam-like: each game runs a **10-question set** with progress.
+**No sound/vibration** features.
+
+## Tech & Setup
+- Build: Vite + React + TypeScript
+- UI: Tailwind CSS (utility-first), CSS variables for tokens
+- State: Zustand
+- Routing: React Router
+- PWA: `vite-plugin-pwa` (offline & installable)
+- Fonts: retro/console pixel fonts (e.g., `Press Start 2P`, `Pixel Emulator`)
+- Lint/Format: ESLint + Prettier
+- i18n: KR copy only (strings centralized)
+
+## Product Overview
+- **App name:** 두뇌수련 (Brain Training)
+- **Home:** console-style **game selection (2-col card grid or vertical menu)**
+- **Initial games:**
+  1) **달러 암산** – `$X` → 원화로 입력 (기본 환율 1,400, 설정에서 변경 가능)
+  2) **평 ↔ ㎡ 환산** – 1평 = 3.3058㎡ 변환(양방향)
+- Each game launches a **10-question exam mode** → Result screen.
+
+## Console UI Guidelines (visual only, no audio)
+- Palette: bg **#1C1C2A** (navy/black), fg **#E0E0E0**, accents **#FF5555 / #88FF88 / #5599FF**
+- Components mimic **console windows/dialog boxes**:
+  - Thick pixel borders, subtle inner shadow
+  - Focus/selection indicated by **cursor ▶** or pressed state (no sound)
+- Typography: fixed-size pixel font; use REM scale but snap to 4px rhythm
+- Key controls: on-screen **numeric keypad** (0–9, clear, submit), min touch 44px
+- Microcopy: short, encouraging, console-like prompts (KR)
+
+## Screens & Behaviors
+### 1) Home (Game Select)
+- Layout
+  - Title bar: “두뇌수련”
+  - Grid(2) **GameCard** list OR vertical console menu (config flag)
+  - Card fields: icon, title, short desc, [시작하기]
+- Example cards:
+  - 달러 암산 – “$400 = ?원”
+  - 평 ↔ ㎡ – “10평 = ?m²”
+- Interaction: hover/pressed visual only; keyboard focus ring for a11y
+
+### 2) Game – Exam Mode (10 questions)
+- Header: question text (large), progress `Q 3/10` + mini **ProgressBar**
+- Body: tiny icon + **NumberInput** with **thousand separator** as typing
+- Footer: **Keypad** (0–9, C, OK). OK disabled until input exists.
+- Answer feedback (visual only):
+  - Correct: green badge “▶ 정답입니다!”
+  - Wrong: red badge “▶ 오답입니다...”
+  - Show calculation rationale (e.g., `400 × 1,400 = 560,000`)
+- Difficulty: 하/중/상 (affects ranges/precision)
+- Generation: deterministic by **date + difficulty seed** (daily set)
+
+### 3) Result
+- Summary: score `8/10`, accuracy %, optional elapsed time, streak
+- CTAs: [다시 풀기], [홈으로]
+
+### 4) Settings
+- 환율 입력(숫자) + 고정 토글
+- 난이도 (하/중/상) – console toggle
+- 평↔㎡ 소수점 자릿수 선택
+- (사운드/진동 옵션 제거)
+
+## Game Rules
+- **달러 암산**: `$X` → KRW using `exchangeRate` (default 1400). Round rules:
+  - 하: X in [5, 100] step 5
+  - 중: X in [20, 400] step 10
+  - 상: X in [50, 1000] step random
+- **평 ↔ ㎡**:
+  - 1평 = **3.3058㎡**
+  - 하: integers only
+  - 중: one decimal
+  - 상: random real with rounding to user preference
+
+## State & Persistence
+- `SettingsStore`: exchangeRate, difficulty, areaPrecision, uiMode("grid"|"menu")
+- `DailyQuizStore`: seed(date+difficulty), currentQuestion, answers[], score
+- Persistence: localStorage (settings, streak, last results)
+- Derived: streak increments if daily score submitted (>=1 game solved)
+
+## Data & Types (sketch)
+```ts
+type Difficulty = "easy" | "medium" | "hard";
+
+type Question = {
+  id: string;            // seed + index
+  type: "USD_TO_KRW" | "PYEONG_TO_SQM" | "SQM_TO_PYEONG";
+  prompt: string;
+  icon?: string;
+  answer: number;        // canonical
+  format?: { decimals?: number; thousand?: boolean };
+};
+
+type GameResult = {
+  date: string; difficulty: Difficulty;
+  total: number; correct: number; ms?: number;
+};
+````
+
+## Files (suggested)
+
+```
+src/
+  app/
+    App.tsx
+    routes/
+      Home.tsx
+      GameDollar.tsx
+      GameArea.tsx
+      Result.tsx
+      Settings.tsx
+  components/
+    ConsoleWindow.tsx
+    GameCard.tsx
+    NumberInput.tsx
+    Keypad.tsx
+    ProgressBar.tsx
+    FeedbackBadge.tsx
+  assets/
+    icons/ (8-bit dollar, ruler, brain, etc.)
+    fonts/
+  stores/
+    settings.ts
+    dailyQuiz.ts
+  lib/
+    rng.ts
+    quiz/dollar.ts
+    quiz/area.ts
+    format.ts
+```
+
+## Implementation Notes
+
+* Keep **pure functions** for question generation (seeded RNG) and formatting.
+* Thousand separator: format only for view; keep numeric value canonical.
+* All interactive elements meet 44px touch min; keyboard/focus a11y.
+* No audio APIs, no vibration API usage.
+
+## Acceptance Criteria
+
+* [ ] Home shows **console-style** selection (grid or menu) with two games.
+* [ ] Each game runs **10 questions** with progress and keypad input.
+* [ ] Visual-only feedback (correct/wrong + rationale), **no sound/vibration**.
+* [ ] Settings persist; exchange rate affects dollar quiz; area precision works.
+* [ ] Daily deterministic sets via seed; results & streak saved to localStorage.
+* [ ] PWA installable; app shell works offline after first load.
+* [ ] UI follows console window/dialog look & retro font & palette tokens.
+
+## Non-Goals (MVP)
+
+* No backend, no authentication, no analytics
+* No leaderboard/social
+* No audio/rumble effects
+
+## Tasks (first passes)
+
+1. Scaffold Vite+TS+React+Tailwind, add fonts & tokens (CSS vars).
+2. Build ConsoleWindow, GameCard, Keypad, NumberInput, ProgressBar.
+3. Implement dollar/area generators (seeded) + formatting utils.
+4. Wire Home → Game flows, 10Q loop, per-question feedback, Result.
+5. Settings (exchangeRate, difficulty, area precision) + persistence.
+6. PWA config + offline testing; a11y focus/roles pass.
+
