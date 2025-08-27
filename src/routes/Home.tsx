@@ -51,6 +51,7 @@ export const Home: React.FC = () => {
 
   return (
     <div className="min-h-screen p-2 sm:p-3 md:p-4 relative">
+      <p></p>
       {/* 픽셀 마스코트 */}
       <div className="text-center mb-4 sm:mb-6 md:mb-8">
         <div className="pixel-mascot mx-auto mb-2 sm:mb-3 md:mb-4"></div>
@@ -74,13 +75,15 @@ export const Home: React.FC = () => {
       </div>
 
       <p></p>
-      {/* 설정 버튼 - 우측 하단 고정 */}
-      <button
-        className="pixel-button fixed bottom-3 right-3 sm:bottom-4 sm:right-4 md:bottom-6 md:right-6 px-3 sm:px-4 md:px-6 py-2 sm:py-3 md:py-4 text-xs sm:text-sm md:text-base shadow-lg z-10"
-        onClick={() => navigate('/settings')}
-      >
-        설정
-      </button>
+      {/* 설정 버튼 - 카드 하위 */}
+      <div className="text-right">
+        <button
+          className="pixel-button px-4 sm:px-6 md:px-8 py-2 sm:py-3 md:py-4 text-xs sm:text-sm md:text-base shadow-lg"
+          onClick={() => navigate('/settings')}
+        >
+          설정
+        </button>
+      </div>
     </div>
   );
 };

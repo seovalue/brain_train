@@ -6,7 +6,7 @@ interface SettingsStore extends Settings {
   setExchangeRate: (rate: number) => void;
   setDifficulty: (difficulty: Difficulty) => void;
   setUiMode: (mode: "grid" | "menu") => void;
-  setQuestionCount: (count: 5 | 10) => void;
+  setQuestionCount: (count: 3 | 5 | 7 | 10) => void;
 }
 
 const defaultSettings: Settings = {
@@ -30,7 +30,7 @@ export const useSettingsStore = create<SettingsStore>()(
       setUiMode: (mode: "grid" | "menu") => 
         set({ uiMode: mode }),
       
-      setQuestionCount: (count: 5 | 10) => 
+      setQuestionCount: (count: 3 | 5 | 7 | 10) => 
         set({ questionCount: count }),
     }),
     {

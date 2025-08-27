@@ -21,13 +21,16 @@ export const Settings: React.FC = () => {
     { value: 'hard', label: '상' }
   ];
 
-  const questionCounts: { value: 5 | 10; label: string }[] = [
+  const questionCounts: { value: 3 | 5 | 7 | 10; label: string }[] = [
+    { value: 3, label: '3개' },
     { value: 5, label: '5개' },
+    { value: 7, label: '7개' },
     { value: 10, label: '10개' }
   ];
 
   return (
     <div className="min-h-screen p-2 sm:p-3 md:p-4">
+      <p></p>
       {/* 헤더 */}
       <div className="mb-4 sm:mb-6 md:mb-8">
         <button
@@ -57,16 +60,17 @@ export const Settings: React.FC = () => {
         </div>
       </ConsoleWindow>
 
+      <p></p>
       {/* 문제 개수 설정 */}
       <ConsoleWindow title="문제 개수 설정" className="mb-6 sm:mb-8 md:mb-10">
         <div className="space-y-4 sm:space-y-6 md:space-y-8 p-4 sm:p-6 md:p-8">
           <div>
             <label className="block text-xs sm:text-sm mb-3 sm:mb-4 md:mb-5">게임당 문제 개수</label>
-            <div className="flex gap-3 sm:gap-4 md:gap-5">
+            <div className="grid grid-cols-2 gap-3 sm:gap-4 md:gap-5">
               {questionCounts.map((count) => (
                 <button
                   key={count.value}
-                  className={`pixel-button flex-1 text-xs sm:text-sm md:text-base py-3 sm:py-4 md:py-5 transition-all duration-200 ${
+                  className={`pixel-button text-xs sm:text-sm md:text-base py-3 sm:py-4 md:py-5 transition-all duration-200 ${
                     questionCount === count.value 
                       ? 'bg-console-blue text-console-bg border-console-blue shadow-lg transform scale-105' 
                       : 'hover:border-console-blue'
@@ -82,6 +86,7 @@ export const Settings: React.FC = () => {
         </div>
       </ConsoleWindow>
 
+      <p></p>
       {/* 난이도 설정 */}
       <ConsoleWindow title="난이도 설정" className="mb-8 sm:mb-10 md:mb-12">
         <div className="space-y-4 sm:space-y-6 md:space-y-8 p-4 sm:p-6 md:p-8">

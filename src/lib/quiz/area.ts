@@ -10,7 +10,7 @@ export function generateAreaQuestions(
   seed: string, 
   difficulty: Difficulty,
   precision: number = 0,
-  questionCount: 5 | 10 = 10
+  questionCount: 3 | 5 | 7 | 10 = 10
 ): Question[] {
   const rng = new SeededRNG(seed);
   const questions: Question[] = [];
