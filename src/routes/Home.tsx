@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ConsoleWindow } from '../components/ConsoleWindow';
 import { GameCard } from '../components/GameCard';
 import { useSettingsStore } from '../stores/settings';
 

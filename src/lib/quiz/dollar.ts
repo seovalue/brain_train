@@ -1,8 +1,5 @@
 import type { Question, Difficulty } from '../../types';
 import { SeededRNG } from '../rng';
-import { formatNumber } from '../format';
-
-const PYEONG_TO_SQM_RATIO = 3.3058;
 
 /**
  * 달러 암산 문제 생성

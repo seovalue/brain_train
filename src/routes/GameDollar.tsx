@@ -17,7 +17,6 @@ export const GameDollar: React.FC = () => {
   const { 
     questions, 
     currentQuestionIndex, 
-    answers, 
     score,
     gameType,
     startQuiz, 
@@ -42,7 +41,6 @@ export const GameDollar: React.FC = () => {
   }, [questions.length, gameType, exchangeRate, difficulty, startQuiz]);
 
   const currentQ = questions[currentQuestionIndex];
-  const currentAnswer = answers[currentQuestionIndex];
 
   const handleNumberClick = (num: number) => {
     if (showFeedback) return;

@@ -88,7 +88,7 @@ export const useDailyQuizStore = create<DailyQuizStore>()(
       },
       
       finishQuiz: () => {
-        const { seed, answers, score, startTime, endTime } = get();
+        const { answers, score, startTime } = get();
         const endTimeNow = Date.now();
         
         set({ endTime: endTimeNow });

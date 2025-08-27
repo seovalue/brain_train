@@ -42,7 +42,6 @@ export const GameArea: React.FC = () => {
   const { 
     questions, 
     currentQuestionIndex, 
-    answers, 
     score,
     gameType,
     startQuiz, 
@@ -67,7 +66,6 @@ export const GameArea: React.FC = () => {
   }, [questions.length, gameType, difficulty, startQuiz]);
 
   const currentQ = questions[currentQuestionIndex];
-  const currentAnswer = answers[currentQuestionIndex];
 
   const handleNumberClick = (num: number) => {
     if (showFeedback) return;
