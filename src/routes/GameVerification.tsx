@@ -96,7 +96,7 @@ export const GameVerification: React.FC = () => {
       setFeedbackMessage(`▶ 오답입니다... 정답: ${formatNumber(currentQuestion.answer)}`);
     }
 
-    submitAnswer(userAnswer);
+    submitAnswer(userAnswer, isCorrect);
     setShowFeedback(true);
 
     // 다음 문제로 이동

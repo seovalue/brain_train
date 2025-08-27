@@ -19,7 +19,7 @@ export const GameCard: React.FC<GameCardProps> = ({
 }) => {
   return (
     <div 
-      className={`game-card ${disabled ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer'} ${comingSoon ? 'coming-soon' : ''}`}
+      className={`game-card flex-shrink-0 ${disabled ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer'} ${comingSoon ? 'coming-soon' : ''}`}
       onClick={disabled ? undefined : onClick}
     >
       <div className="text-2xl sm:text-3xl mb-2 sm:mb-3">{icon}</div>

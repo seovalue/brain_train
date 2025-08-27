@@ -32,8 +32,8 @@ export const Home: React.FC = () => {
     {
       id: 'verification',
       icon: '📱',
-      title: '인증번호 기억하기',
-      description: '6자리 숫자 외우기',
+      title: '인증번호 외우기',
+      description: '6자리 수 기억하기',
       path: '/game/verification',
       disabled: false
     },

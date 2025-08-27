@@ -86,8 +86,8 @@ export const GameArea: React.FC = () => {
     const tolerance = getAreaTolerance(currentQ.answer, difficulty);
     const correct = Math.abs(userAnswer - currentQ.answer) <= tolerance;
     
-    // 답안 제출
-    submitAnswer(userAnswer);
+    // 답안 제출 (정확도 판정 결과 포함)
+    submitAnswer(userAnswer, correct);
     
     // 피드백 표시
     const message = generateAreaRationale(currentQ, userAnswer, tolerance);

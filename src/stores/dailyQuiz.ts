@@ -18,7 +18,7 @@ interface DailyQuizState {
 interface DailyQuizStore extends DailyQuizState {
   // Actions
   startQuiz: (questions: Question[], gameType: string) => void;
-  submitAnswer: (answer: number) => void;
+  submitAnswer: (answer: number, isCorrect?: boolean) => void;
   nextQuestion: () => void;
   finishQuiz: () => GameResult;
   resetQuiz: () => void;
@@ -58,20 +58,22 @@ export const useDailyQuizStore = create<DailyQuizStore>()(
         });
       },
       
-      submitAnswer: (answer: number) => {
+      submitAnswer: (answer: number, isCorrect?: boolean) => {
         const { questions, currentQuestionIndex, answers, score } = get();
         
         if (currentQuestionIndex >= questions.length) return;
         
         const question = questions[currentQuestionIndex];
-        const isCorrect = Math.abs(answer - question.answer) < 0.01;
+        
+        // isCorrect가 제공되지 않은 경우 기본 판정 로직 사용
+        const correct = isCorrect !== undefined ? isCorrect : Math.abs(answer - question.answer) < 0.01;
         
         const newAnswers = [...answers];
         newAnswers[currentQuestionIndex] = answer;
         
         set({
           answers: newAnswers,
-          score: score + (isCorrect ? 1 : 0),
+          score: score + (correct ? 1 : 0),
         });
       },
       

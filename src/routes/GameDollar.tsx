@@ -58,8 +58,8 @@ export const GameDollar: React.FC = () => {
     const userAnswer = parseNumber(inputValue);
     const correct = Math.abs(userAnswer - currentQ.answer) < 1;
     
-    // 답안 제출
-    submitAnswer(userAnswer);
+    // 답안 제출 (정확도 판정 결과 포함)
+    submitAnswer(userAnswer, correct);
     
     // 피드백 표시
     const dollarAmount = parseFloat(currentQ.prompt.split('$')[1].split('=')[0]);
