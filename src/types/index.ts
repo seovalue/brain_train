@@ -1,6 +1,15 @@
 export type Difficulty = "easy" | "medium" | "hard";
 
-export type QuestionType = "USD_TO_KRW" | "PYEONG_TO_SQM" | "SQM_TO_PYEONG" | "VERIFICATION_CODE" | "DREAM_GRANDFATHER" | "REACTION_TIME";
+export type QuestionType = "USD_TO_KRW" | "PYEONG_TO_SQM" | "SQM_TO_PYEONG" | "VERIFICATION_CODE" | "DREAM_GRANDFATHER" | "REACTION_TIME" | "ROCK_PAPER_SCISSORS";
+
+export type RockPaperScissors = "rock" | "paper" | "scissors";
+export type RPSPrompt = 
+  | "이기지도 비기지도 말아주세요."
+  | "비기지도 말고 지지도 말아주세요"
+  | "이겨주세요"
+  | "비겨주세요"
+  | "져 주세요"
+  | "이기지도 지지도 말아주세요";
 
 export type Question = {
   id: string;
@@ -13,6 +22,10 @@ export type Question = {
     decimals?: number; 
     thousand?: boolean;
   };
+  // 가위바위보 게임용 필드들
+  systemChoice?: RockPaperScissors;
+  rpsPrompt?: RPSPrompt;
+  timeLimit?: number; // 5초 제한시간
 };
 
 export type GameResult = {

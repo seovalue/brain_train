@@ -46,6 +46,8 @@ export function calculateGameResult(
   switch (gameType) {
     case 'reaction':
       return calculateReactionGameResult(reactionTimes, totalTime);
+    case 'rps':
+      return calculateDefaultGameResult(answers, score, totalTime);
     default:
       return calculateDefaultGameResult(answers, score, totalTime);
   }
@@ -108,6 +110,8 @@ export function submitGameAnswer(
   switch (gameType) {
     case 'reaction':
       return submitReactionAnswer(reactionTimes, answer);
+    case 'rps':
+      return submitDefaultAnswer(answers, score, currentIndex, answer, question, isCorrect);
     default:
       return submitDefaultAnswer(answers, score, currentIndex, answer, question, isCorrect);
   }

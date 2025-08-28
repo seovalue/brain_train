@@ -24,6 +24,22 @@ export const Home: React.FC = () => {
     difficulty?: 'easy' | 'medium' | 'hard';
   }> = [
     {
+      id: 'rps',
+      icon: '✊',
+      title: '가위바위보',
+      description: '5초 안에 선택!',
+      path: '/game/rps',
+      disabled: false
+    },
+    {
+      id: 'verification',
+      icon: '📱',
+      title: '인증번호\n외우기',
+      description: '6자리 수 기억하기',
+      path: '/game/verification',
+      disabled: false
+    },
+    {
       id: 'dollar',
       icon: '💵',
       title: '달러 암산',
@@ -37,15 +53,8 @@ export const Home: React.FC = () => {
       title: '평수 변환',
       description: '10평 = ?㎡',
       path: '/game/area',
-      disabled: false
-    },
-    {
-      id: 'verification',
-      icon: '📱',
-      title: '인증번호\n외우기',
-      description: '6자리 수 기억하기',
-      path: '/game/verification',
-      disabled: false
+      disabled: false,
+      difficulty: 'hard'
     },
     {
       id: 'dream',
@@ -63,15 +72,6 @@ export const Home: React.FC = () => {
       description: '3,2,1... 클릭!',
       path: '/game/reaction',
       disabled: false
-    },
-    {
-      id: 'coming2',
-      icon: '🎯',
-      title: '준비중',
-      description: '준비 중입니다',
-      path: '',
-      disabled: true,
-      comingSoon: true
     }
   ];
 

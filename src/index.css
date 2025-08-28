@@ -318,3 +318,18 @@ body {
     padding: 8px;
   }
 }
+
+/* 픽셀 텍스트 그림자 */
+.text-shadow-pixel {
+  text-shadow: 
+    2px 2px 0 #000,
+    -2px -2px 0 #000,
+    2px -2px 0 #000,
+    -2px 2px 0 #000,
+    1px 1px 0 #000,
+    -1px -1px 0 #000,
+    1px -1px 0 #000,
+    -1px 1px 0 #000;
+  letter-spacing: 0.1em;
+  font-weight: bold;
+}
