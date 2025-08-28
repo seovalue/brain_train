@@ -90,7 +90,7 @@ export const ShareImage = forwardRef<HTMLDivElement, ShareImageProps>(({ result,
         {/* 웹사이트 URL */}
         <div className="text-center">
           <p className="text-xl text-[#E0E0E0] mb-3">당신도 도전해보세요!</p>
-          <p className="text-2xl text-[#5599FF] font-bold">brain-train-ing.vercel.app</p>
+          <p className="text-2xl text-[#5599FF] font-bold">alwaysdo.xyz</p>
         </div>
       </div>
     </div>
