@@ -7,7 +7,8 @@ interface GameCardProps {
   onClick: () => void;
   disabled?: boolean;
   comingSoon?: boolean;
-  difficulty?: 'easy' | 'medium' | 'hard';
+  difficulty?: 'easy' | 'medium' | 'hard'
+  isNew?: boolean;
 }
 
 export const GameCard: React.FC<GameCardProps> = ({
@@ -17,7 +18,8 @@ export const GameCard: React.FC<GameCardProps> = ({
   onClick,
   disabled = false,
   comingSoon = false,
-  difficulty
+  difficulty,
+  isNew = false,
 }) => {
   return (
     <div 
@@ -29,12 +31,16 @@ export const GameCard: React.FC<GameCardProps> = ({
           <div className="bg-red-600 text-white text-xs px-2 py-1 rounded font-bold border border-red-700 shadow-sm" style={{backgroundColor: '#dc2626', color: 'white'}}>
             고난이도
           </div>
+        ) : isNew ? (
+          <div className="bg-yellow-500 text-black text-xs px-2 py-1 rounded font-bold border border-yellow-600 shadow-sm" style={{backgroundColor: '#88FF88', color: 'black'}}>
+            신규 게임!
+          </div>
         ) : (
           icon
         )}
       </div>
       <h3 className="text-xs sm:text-sm font-bold mb-0.5 sm:mb-1 whitespace-pre-line">{title}</h3>
-      <p className="text-xs text-console-fg/70 mb-3 sm:mb-4 leading-tight">{description}</p>
+      <p className="text-xs text-console-fg/70 mb-3 sm:mb-4 leading-tight whitespace-pre-line">{description}</p>
       
       {comingSoon ? (
         <div className="text-center">
