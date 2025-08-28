@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>두뇌수련 OG Image Generator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Press Start 2P', monospace;
+            background-color: #1C1C2A;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .og-container {
+            width: 1200px;
+            height: 630px;
+            background: linear-gradient(135deg, #1C1C2A 0%, #2A2A3A 100%);
+            position: relative;
+            overflow: hidden;
+            border: 4px solid #88FF88;
+            box-shadow: 
+                inset 4px 4px 0 rgba(136, 255, 136, 0.2),
+                inset -4px -4px 0 rgba(0, 0, 0, 0.3);
+        }
+
+        /* 배경 픽셀 패턴 */
+        .pixel-pattern {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 25% 25%, rgba(136, 255, 136, 0.06) 1px, transparent 1px),
+                radial-gradient(circle at 75% 75%, rgba(85, 153, 255, 0.06) 1px, transparent 1px);
+            background-size: 25px 25px;
+            opacity: 0.8;
+        }
+
+        /* 메인 콘텐츠 */
+        .content {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            padding: 60px;
+        }
+
+        /* 로고 영역 */
+        .logo-section {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .brain-icon {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 20px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* 픽셀 아트 뇌 아이콘 */
+        .brain-pixel {
+            display: grid;
+            grid-template-columns: repeat(26, 3px);
+            grid-template-rows: repeat(24, 3px);
+            gap: 0;
+            width: 78px;
+            height: 72px;
+        }
+
+        .brain-pixel-cell {
+            width: 3px;
+            height: 3px;
+            background-color: #88FF88;
+        }
+
+        .brain-pixel-cell.wrinkle {
+            background-color: #66CC66;
+        }
+
+        .brain-pixel-cell.highlight {
+            background-color: #A8FFA8;
+        }
+
+        .app-title {
+            font-size: 56px;
+            font-weight: bold;
+            color: #88FF88;
+            text-shadow: 3px 3px 0 rgba(0, 0, 0, 0.7);
+            margin-bottom: 15px;
+            letter-spacing: 2px;
+        }
+
+        .app-subtitle {
+            font-size: 28px;
+            color: #E0E0E0;
+            opacity: 0.9;
+            letter-spacing: 1px;
+        }
+
+        /* 설명 텍스트 */
+        .description {
+            font-size: 32px;
+            color: #E0E0E0;
+            text-align: center;
+            line-height: 1.4;
+            max-width: 800px;
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(42, 42, 58, 0.8);
+            border: 2px solid #5599FF;
+            border-radius: 8px;
+            box-shadow: inset 2px 2px 0 rgba(85, 153, 255, 0.2);
+        }
+
+        /* 장식 요소 */
+        .decoration {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .corner {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            border: 3px solid #88FF88;
+        }
+
+        .corner.top-left {
+            top: 20px;
+            left: 20px;
+            border-right: none;
+            border-bottom: none;
+        }
+
+        .corner.top-right {
+            top: 20px;
+            right: 20px;
+            border-left: none;
+            border-bottom: none;
+        }
+
+        .corner.bottom-left {
+            bottom: 20px;
+            left: 20px;
+            border-right: none;
+            border-top: none;
+        }
+
+        .corner.bottom-right {
+            bottom: 20px;
+            right: 20px;
+            border-left: none;
+            border-top: none;
+        }
+
+        /* 픽셀 라인 */
+        .pixel-line {
+            position: absolute;
+            background: linear-gradient(90deg, transparent, #88FF88, transparent);
+            height: 2px;
+            opacity: 0.7;
+        }
+
+        .pixel-line.top {
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 300px;
+        }
+
+        .pixel-line.bottom {
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 300px;
+        }
+
+        /* 웹사이트 URL */
+        .website-url {
+            position: absolute;
+            bottom: 30px;
+            right: 30px;
+            font-size: 20px;
+            color: #5599FF;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        /* 장식 사각형 */
+        .decoration-square {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #FF5555;
+            opacity: 0.6;
+        }
+
+        .decoration-square.top-left {
+            top: 100px;
+            left: 100px;
+        }
+
+        .decoration-square.top-right {
+            top: 100px;
+            right: 100px;
+        }
+
+        .decoration-square.bottom-left {
+            bottom: 110px;
+            left: 100px;
+        }
+
+        .decoration-square.bottom-right {
+            bottom: 110px;
+            right: 100px;
+        }
+
+        /* 다운로드 버튼 */
+        .download-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #88FF88;
+            color: #1C1C2A;
+            border: none;
+            padding: 12px 24px;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 14px;
+            cursor: pointer;
+            border-radius: 4px;
+            box-shadow: 0 4px 0 rgba(0, 0, 0, 0.2);
+            transition: all 0.1s ease;
+        }
+
+        .download-btn:hover {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 rgba(0, 0, 0, 0.2);
+        }
+
+        .download-btn:active {
+            transform: translateY(4px);
+            box-shadow: none;
+        }
+    </style>
+</head>
+<body>
+
+    
+    <div class="og-container" id="og-image">
+        <!-- 배경 픽셀 패턴 -->
+        <div class="pixel-pattern"></div>
+        
+        <!-- 장식 요소 -->
+        <div class="decoration">
+            <div class="corner top-left"></div>
+            <div class="corner top-right"></div>
+            <div class="corner bottom-left"></div>
+            <div class="corner bottom-right"></div>
+            <div class="pixel-line top"></div>
+            <div class="pixel-line bottom"></div>
+            <div class="decoration-square top-left"></div>
+            <div class="decoration-square top-right"></div>
+            <div class="decoration-square bottom-left"></div>
+            <div class="decoration-square bottom-right"></div>
+        </div>
+
+        <!-- 메인 콘텐츠 -->
+        <div class="content">
+            <div class="logo-section">
+                <div class="brain-icon">
+                    <div class="brain-pixel" id="brain-pixel"></div>
+                </div>
+                <h1 class="app-title">두뇌수련</h1>
+                <p class="app-subtitle">Brain Training</p>
+            </div>
+            
+            <div class="description">
+                늘 두뇌를 수련하세요
+            </div>
+        </div>
+
+        <!-- 웹사이트 URL -->
+        <div class="website-url">alwaysdo.xyz</div>
+    </div>
+
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <script>
+        // 뇌 픽셀 아트 생성
+        function createBrainPixelArt() {
+            const brainContainer = document.getElementById('brain-pixel');
+            
+            // 뇌의 기본 모양 (26x24 픽셀)
+            const brainShape = [
+                [0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0],
+                [0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0],
+                [0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0],
+                [0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0],
+                [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+                [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+                [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+                [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+                [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+                [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+                [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+                [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+                [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+                [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+                [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+                [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+                [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+                [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+                [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+                [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+                [0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0],
+                [0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0],
+                [0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0],
+                [0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0]
+            ];
+
+            // 주름 패턴
+            const wrinklePatterns = [
+                [3,6], [3,19], [4,5], [4,20], [5,4], [5,21], [6,3], [6,22],
+                [7,4], [7,21], [8,5], [8,20], [9,6], [9,19], [10,7], [10,18],
+                [11,8], [11,17], [12,9], [12,16], [13,10], [13,15], [14,11], [14,14],
+                [15,12], [15,13], [16,11], [16,14], [17,10], [17,15], [18,9], [18,16],
+                [19,8], [19,17], [20,7], [20,18], [21,6], [21,19], [22,5], [22,20]
+            ];
+
+            // 하이라이트 패턴
+            const highlightPatterns = [
+                [8,8], [8,17], [10,9], [10,16], [12,10], [12,15],
+                [14,11], [14,14], [16,12], [16,13]
+            ];
+
+            // 뇌 픽셀 생성
+            for (let y = 0; y < 24; y++) {
+                for (let x = 0; x < 26; x++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'brain-pixel-cell';
+                    
+                    if (brainShape[y] && brainShape[y][x]) {
+                        // 주름인지 확인
+                        const isWrinkle = wrinklePatterns.some(([wy, wx]) => wy === y && wx === x);
+                        const isHighlight = highlightPatterns.some(([hy, hx]) => hy === y && hx === x);
+                        
+                        if (isHighlight) {
+                            cell.classList.add('highlight');
+                        } else if (isWrinkle) {
+                            cell.classList.add('wrinkle');
+                        }
+                    } else {
+                        cell.style.backgroundColor = 'transparent';
+                    }
+                    
+                    brainContainer.appendChild(cell);
+                }
+            }
+        }
+
+        function downloadImage() {
+            const element = document.getElementById('og-image');
+            
+            html2canvas(element, {
+                width: 1200,
+                height: 630,
+                scale: 1,
+                backgroundColor: '#1C1C2A',
+                useCORS: true,
+                allowTaint: true
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = '두뇌수련-og-image.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            });
+        }
+
+        // 페이지 로드 시 뇌 픽셀 아트 생성
+        window.addEventListener('load', createBrainPixelArt);
+    </script>
+</body>
+</html>

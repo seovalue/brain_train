@@ -3,10 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { track } from '@vercel/analytics';
 import { GameCard } from '../components/GameCard';
 import { useSettingsStore } from '../stores/settings';
+import { useDailyQuizStore } from '../stores/dailyQuiz';
 
 export const Home: React.FC = () => {
   const navigate = useNavigate();
   const { uiMode } = useSettingsStore();
+  const { resetQuiz } = useDailyQuizStore();
 
   useEffect(() => {
     console.log('Home component mounted');
@@ -62,7 +64,7 @@ export const Home: React.FC = () => {
       id: 'dream',
       icon: '👴',
       title: '꿈에서\n할아버지가..',
-      description: '뭐였더라?',
+      description: '뭐라고 하셨더라?',
       path: '/game/dream',
       disabled: false,
       difficulty: 'hard'
@@ -101,6 +103,8 @@ export const Home: React.FC = () => {
                   gameType: game.id,
                   gameTitle: game.title,
                 });
+                // 게임 시작 전 상태 초기화
+                resetQuiz();
                 navigate(game.path);
               }
             }}

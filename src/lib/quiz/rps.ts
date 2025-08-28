@@ -2,11 +2,8 @@ import { SeededRNG } from '../rng';
 import type { RockPaperScissors, RPSPrompt, Question } from '../../types';
 
 const RPS_PROMPTS: RPSPrompt[] = [
-  "이기지도 비기지도 말아주세요.",
-  "비기지도 말고 지지도 말아주세요",
-  "이겨주세요",
-  "비겨주세요",
-  "져 주세요",
+  "이기지도 비기지도 말아주세요",
+  "비기지도 말고\n지지도 말아주세요",
   "이기지도 지지도 말아주세요"
 ];
 
@@ -30,22 +27,13 @@ export function getRPSResult(system: RockPaperScissors, user: RockPaperScissors)
 // 프롬프트에 따른 정답 계산
 export function getCorrectAnswer(system: RockPaperScissors, prompt: RPSPrompt): RockPaperScissors {
   switch (prompt) {
-    case "이기지도 비기지도 말아주세요.":
+    case "이기지도 비기지도 말아주세요":
       // 이기지도 비기지도 말라는 것은 지라는 뜻
       return getLosingChoice(system);
       
-    case "비기지도 말고 지지도 말아주세요":
+    case "비기지도 말고\n지지도 말아주세요":
       // 비기지도 말고 지지도 말라는 것은 이기라는 뜻
       return getWinningChoice(system);
-      
-    case "이겨주세요":
-      return getWinningChoice(system);
-      
-    case "비겨주세요":
-      return system; // 같은 것을 내면 비김
-      
-    case "져 주세요":
-      return getLosingChoice(system);
       
     case "이기지도 지지도 말아주세요":
       // 이기지도 지지도 말라는 것은 비기라는 뜻
@@ -73,11 +61,18 @@ function getLosingChoice(system: RockPaperScissors): RockPaperScissors {
 }
 
 // 가위바위보 문제 생성
-export function generateRPSQuestion(seed: string, index: number): Question {
+export function generateRPSQuestion(seed: string, index: number, previousPrompt?: RPSPrompt): Question {
   const rng = new SeededRNG(seed + "-rps-" + index);
   
   const systemChoice = rng.pick(RPS_CHOICES);
-  const prompt = rng.pick(RPS_PROMPTS);
+  
+  // 이전 프롬프트와 다른 프롬프트 선택
+  let availablePrompts = RPS_PROMPTS;
+  if (previousPrompt && RPS_PROMPTS.length > 1) {
+    availablePrompts = RPS_PROMPTS.filter(p => p !== previousPrompt);
+  }
+  
+  const prompt = rng.pick(availablePrompts);
   const correctAnswer = getCorrectAnswer(systemChoice, prompt);
   
   // 정답을 숫자로 변환 (0: rock, 1: paper, 2: scissors)

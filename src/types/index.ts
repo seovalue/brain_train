@@ -4,11 +4,8 @@ export type QuestionType = "USD_TO_KRW" | "PYEONG_TO_SQM" | "SQM_TO_PYEONG" | "V
 
 export type RockPaperScissors = "rock" | "paper" | "scissors";
 export type RPSPrompt = 
-  | "이기지도 비기지도 말아주세요."
-  | "비기지도 말고 지지도 말아주세요"
-  | "이겨주세요"
-  | "비겨주세요"
-  | "져 주세요"
+  | "이기지도 비기지도 말아주세요"
+  | "비기지도 말고\n지지도 말아주세요"
   | "이기지도 지지도 말아주세요";
 
 export type Question = {

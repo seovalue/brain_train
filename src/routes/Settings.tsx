@@ -2,24 +2,15 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ConsoleWindow } from '../components/ConsoleWindow';
 import { useSettingsStore } from '../stores/settings';
-import type { Difficulty } from '../types';
 
 export const Settings: React.FC = () => {
   const navigate = useNavigate();
   const {
     exchangeRate,
-    difficulty,
     questionCount,
     setExchangeRate,
-    setDifficulty,
     setQuestionCount
   } = useSettingsStore();
-
-  const difficulties: { value: Difficulty; label: string }[] = [
-    { value: 'easy', label: '하' },
-    { value: 'medium', label: '중' },
-    { value: 'hard', label: '상' }
-  ];
 
   const questionCounts: { value: 3 | 5 | 7 | 10; label: string }[] = [
     { value: 3, label: '3개' },
@@ -87,7 +78,7 @@ export const Settings: React.FC = () => {
       </ConsoleWindow>
 
       <p></p>
-      {/* 난이도 설정 */}
+      {/* 난이도 설정
       <ConsoleWindow title="난이도 설정" className="mb-8 sm:mb-10 md:mb-12">
         <div className="space-y-4 sm:space-y-6 md:space-y-8 p-4 sm:p-6 md:p-8">
           <div>
@@ -110,7 +101,7 @@ export const Settings: React.FC = () => {
             <p className="text-xs text-console-fg/70 mt-2">현재 설정: {difficulties.find(d => d.value === difficulty)?.label}</p>
           </div>
         </div>
-      </ConsoleWindow>
+      </ConsoleWindow> */}
 
       {/* 저장 완료 메시지 */}
       <div className="text-center text-xs sm:text-sm text-console-fg/70 mt-6 sm:mt-8 md:mt-10">

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ConsoleWindow } from '../components/ConsoleWindow';
 import { ProgressBar } from '../components/ProgressBar';
@@ -6,7 +6,7 @@ import { FeedbackBadge } from '../components/FeedbackBadge';
 import { useDailyQuizStore } from '../stores/dailyQuiz';
 import { useSettingsStore } from '../stores/settings';
 import { generateRPSQuestion, numberToUserChoice, getRPSResultMessage } from '../lib/quiz/rps';
-import type { RockPaperScissors, Question } from '../types';
+import type { RockPaperScissors, Question, RPSPrompt } from '../types';
 
 const RPS_ICONS = {
   rock: "✊",
@@ -19,6 +19,9 @@ const RPS_NAMES = {
   paper: "보",
   scissors: "가위"
 };
+
+// 타임아웃 설정 (초 단위)
+const TIMEOUT_SECONDS = 2;
 
 export default function GameRPS() {
   const navigate = useNavigate();
@@ -39,15 +42,20 @@ export default function GameRPS() {
   const [showFeedback, setShowFeedback] = useState(false);
   const [feedbackMessage, setFeedbackMessage] = useState("");
   const [isCorrect, setIsCorrect] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(5);
+  const [timeLeft, setTimeLeft] = useState(TIMEOUT_SECONDS);
   const [isAnswered, setIsAnswered] = useState(false);
+  const nextQuestionTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // 게임 시작 시 문제 생성
   useEffect(() => {
+    // 문제가 없는 경우에만 새로운 문제 생성
     if (questions.length === 0) {
-      const rpsQuestions = Array.from({ length: questionCount }, (_, i) => 
-        generateRPSQuestion(seed, i)
-      );
+      let previousPrompt: RPSPrompt | undefined;
+      const rpsQuestions = Array.from({ length: questionCount }, (_, i) => {
+        const question = generateRPSQuestion(seed, i, previousPrompt);
+        previousPrompt = question.rpsPrompt;
+        return question;
+      });
       startQuiz(rpsQuestions, 'rps');
     }
   }, [seed, questionCount, questions.length, startQuiz]);
@@ -61,37 +69,41 @@ export default function GameRPS() {
 
   // 문제 변경 시 상태 초기화
   useEffect(() => {
+    // 이전 타이머 정리
+    if (nextQuestionTimeoutRef.current) {
+      clearTimeout(nextQuestionTimeoutRef.current);
+      nextQuestionTimeoutRef.current = null;
+    }
+    
     setSelectedChoice(null);
     setShowFeedback(false);
     setFeedbackMessage("");
     setIsCorrect(false);
-    setTimeLeft(5);
+    setTimeLeft(TIMEOUT_SECONDS);
     setIsAnswered(false);
   }, [currentQuestionIndex]);
 
+  // 컴포넌트 언마운트 시 타이머 정리
+  useEffect(() => {
+    return () => {
+      if (nextQuestionTimeoutRef.current) {
+        clearTimeout(nextQuestionTimeoutRef.current);
+      }
+    };
+  }, []);
+
   const handleAnswer = useCallback((choice: RockPaperScissors | null) => {
-    if (isAnswered || !currentQuestionData) return;
+    if (!currentQuestionData || isAnswered) return;
     
-    setIsAnswered(true);
     const userChoice = choice || selectedChoice;
     
     if (!userChoice) {
-      // 시간 초과로 답하지 않은 경우
-      setFeedbackMessage("▶ 시간 초과입니다...");
-      setIsCorrect(false);
-      setShowFeedback(true);
-      submitAnswer(-1, false); // -1은 오답을 의미
-      
-      setTimeout(() => {
-        if (currentQuestionIndex < questionCount - 1) {
-          nextQuestion();
-        } else {
-          const result = finishQuiz();
-          navigate('/result', { state: { result, gameType: 'rps' } });
-        }
-      }, 2000);
+      // 시간 초과는 타이머에서 처리하므로 여기서는 아무것도 하지 않음
       return;
     }
+
+    // 이미 답변했음을 표시
+    setIsAnswered(true);
 
     const isAnswerCorrect = userChoice === numberToUserChoice(currentQuestionData.answer);
     const message = getRPSResultMessage(
@@ -106,15 +118,23 @@ export default function GameRPS() {
 
     submitAnswer(userChoiceToNumber(userChoice), isAnswerCorrect);
 
-    setTimeout(() => {
-      if (currentQuestionIndex < questionCount - 1) {
+    // 이전 타이머가 있다면 정리
+    if (nextQuestionTimeoutRef.current) {
+      clearTimeout(nextQuestionTimeoutRef.current);
+    }
+    
+    nextQuestionTimeoutRef.current = setTimeout(() => {
+      // 현재 상태를 직접 가져와서 사용
+      const currentState = useDailyQuizStore.getState();
+      if (currentState.currentQuestionIndex < questionCount - 1) {
         nextQuestion();
       } else {
         const result = finishQuiz();
         navigate('/result', { state: { result, gameType: 'rps' } });
       }
+      nextQuestionTimeoutRef.current = null;
     }, 2000);
-  }, [currentQuestionIndex, currentQuestionData, selectedChoice, isAnswered, questionCount, navigate, submitAnswer, nextQuestion, finishQuiz]);
+  }, [currentQuestionData, selectedChoice, isAnswered, questionCount, navigate, submitAnswer, nextQuestion, finishQuiz]);
 
   const handleChoiceSelect = useCallback((choice: RockPaperScissors) => {
     if (isAnswered) return;
@@ -132,7 +152,35 @@ export default function GameRPS() {
         if (prev <= 1) {
           // 시간 초과 시 자동으로 오답 처리
           clearInterval(timer);
-          handleAnswer(null);
+          
+          // 이미 답변했는지 한 번 더 확인
+          if (isAnswered) return 0;
+          
+          setIsAnswered(true);
+          
+          // 시간 초과 처리 - handleAnswer와 분리
+          setFeedbackMessage("▶ 시간 초과입니다...");
+          setIsCorrect(false);
+          setShowFeedback(true);
+          submitAnswer(-1, false); // -1은 오답을 의미
+          
+          // 이전 타이머가 있다면 정리
+          if (nextQuestionTimeoutRef.current) {
+            clearTimeout(nextQuestionTimeoutRef.current);
+          }
+          
+          nextQuestionTimeoutRef.current = setTimeout(() => {
+            // 현재 상태를 직접 가져와서 사용
+            const currentState = useDailyQuizStore.getState();
+            if (currentState.currentQuestionIndex < questionCount - 1) {
+              nextQuestion();
+            } else {
+              const result = finishQuiz();
+              navigate('/result', { state: { result, gameType: 'rps' } });
+            }
+            nextQuestionTimeoutRef.current = null;
+          }, 2000);
+          
           return 0;
         }
         return prev - 1;
@@ -140,35 +188,9 @@ export default function GameRPS() {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [isAnswered, handleAnswer]);
+  }, [isAnswered, questionCount, navigate, submitAnswer, nextQuestion, finishQuiz]);
 
-  // 키보드 이벤트 처리
-  useEffect(() => {
-    const handleKeyPress = (e: KeyboardEvent) => {
-      if (isAnswered) return;
-      
-      switch (e.key) {
-        case '1':
-        case 'q':
-        case 'Q':
-          handleChoiceSelect('rock');
-          break;
-        case '2':
-        case 'w':
-        case 'W':
-          handleChoiceSelect('paper');
-          break;
-        case '3':
-        case 'e':
-        case 'E':
-          handleChoiceSelect('scissors');
-          break;
-      }
-    };
 
-    window.addEventListener('keydown', handleKeyPress);
-    return () => window.removeEventListener('keydown', handleKeyPress);
-  }, [handleChoiceSelect, isAnswered]);
 
   return (
     <div className="min-h-screen flex items-center justify-center p-2">
@@ -202,7 +224,7 @@ export default function GameRPS() {
           <div className="w-full bg-[#2A2A3A] h-3 rounded">
             <div 
               className="bg-[#FF5555] h-3 rounded transition-all duration-1000"
-              style={{ width: `${(timeLeft / 5) * 100}%` }}
+              style={{ width: `${(timeLeft / TIMEOUT_SECONDS) * 100}%` }}
             />
           </div>
         </div>
@@ -221,7 +243,12 @@ export default function GameRPS() {
                 {/* 프롬프트 */}
                 <div className="mb-10 text-center">
                   <div className="text-[1.2rem] font-pixel text-[#5599FF] mb-2 tracking-wider leading-tight">
-                    <p className="font-bold text-shadow-pixel">{currentQuestionData.rpsPrompt}!</p>
+                    <p 
+                      className="font-bold text-shadow-pixel whitespace-pre-line"
+                      dangerouslySetInnerHTML={{ 
+                        __html: currentQuestionData.rpsPrompt + '!' 
+                      }}
+                    />
                   </div>
                 </div>
 
