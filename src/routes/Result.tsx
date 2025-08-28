@@ -117,7 +117,7 @@ export const Result: React.FC = () => {
                   alert('공유 텍스트가 클립보드에 복사되었습니다!');
                 }}
               >
-               🤝 두뇌수련 친구와 함께하기 
+               🤝 내 결과 자랑하기 
               </button>
             
             <button
