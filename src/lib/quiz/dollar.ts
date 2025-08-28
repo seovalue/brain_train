@@ -2,6 +2,51 @@ import type { Question, Difficulty } from '../../types';
 import { SeededRNG, generateDetailedSeed } from '../rng';
 
 /**
+ * 중복되지 않는 달러 금액 배열 생성
+ */
+function generateUniqueDollarAmounts(
+  rng: SeededRNG, 
+  difficulty: Difficulty, 
+  count: number
+): number[] {
+  const amounts = new Set<number>();
+  
+  // 충분한 후보 풀 생성 (count의 3배 정도)
+  const candidatePool = generateCandidatePool(rng, difficulty, count * 3);
+  
+  // 중복되지 않는 금액들을 선택
+  for (const amount of candidatePool) {
+    if (amounts.size >= count) break;
+    amounts.add(amount);
+  }
+  
+  // 만약 충분한 수가 없다면 추가 생성
+  while (amounts.size < count) {
+    const additionalAmount = generateDollarAmount(rng, difficulty);
+    amounts.add(additionalAmount);
+  }
+  
+  return Array.from(amounts).slice(0, count);
+}
+
+/**
+ * 난이도별 후보 풀 생성
+ */
+function generateCandidatePool(
+  rng: SeededRNG, 
+  difficulty: Difficulty, 
+  poolSize: number
+): number[] {
+  const candidates: number[] = [];
+  
+  for (let i = 0; i < poolSize; i++) {
+    candidates.push(generateDollarAmount(rng, difficulty));
+  }
+  
+  return candidates;
+}
+
+/**
  * 달러 암산 문제 생성
  */
 export function generateDollarQuestions(
@@ -11,13 +56,15 @@ export function generateDollarQuestions(
   questionCount: 3 | 5 | 7 | 10 = 5
 ): Question[] {
   const questions: Question[] = [];
+  
+  // 중복되지 않는 달러 금액들을 미리 생성
+  const detailedSeed = generateDetailedSeed(seed, difficulty, 0, 'dollar');
+  const rng = new SeededRNG(detailedSeed);
+  const uniqueAmounts = generateUniqueDollarAmounts(rng, difficulty, questionCount);
 
+  // 생성된 금액들로 문제 생성
   for (let i = 0; i < questionCount; i++) {
-    // 각 문제마다 다른 시드 사용하여 랜덤성 증가
-    const detailedSeed = generateDetailedSeed(seed, difficulty, i, 'dollar');
-    const rng = new SeededRNG(detailedSeed);
-    
-    const dollarAmount = generateDollarAmount(rng, difficulty);
+    const dollarAmount = uniqueAmounts[i];
     const answer = Math.round(dollarAmount * exchangeRate);
 
     questions.push({

@@ -3,7 +3,102 @@ import { SeededRNG } from '../rng';
 
 const PYEONG_TO_SQM_RATIO = 3.3;
 
+/**
+ * 중복되지 않는 평수 변환 문제 데이터 생성
+ */
+interface AreaProblemData {
+  type: 'PYEONG_TO_SQM' | 'SQM_TO_PYEONG';
+  pyeongAmount?: number;
+  sqmAmount?: number;
+  answer: number;
+}
 
+function generateUniqueAreaProblems(
+  rng: SeededRNG,
+  difficulty: Difficulty,
+  precision: number,
+  count: number
+): AreaProblemData[] {
+  const problems = new Set<string>(); // 중복 체크용
+  const result: AreaProblemData[] = [];
+  
+  // 충분한 후보 풀 생성
+  const candidatePool = generateAreaCandidatePool(rng, difficulty, precision, count * 3);
+  
+  // 중복되지 않는 문제들을 선택
+  for (const problem of candidatePool) {
+    if (result.length >= count) break;
+    
+    const problemKey = `${problem.type}_${problem.answer}`;
+    if (!problems.has(problemKey)) {
+      problems.add(problemKey);
+      result.push(problem);
+    }
+  }
+  
+  // 만약 충분한 수가 없다면 추가 생성
+  while (result.length < count) {
+    const additionalProblem = generateSingleAreaProblem(rng, difficulty, precision);
+    const problemKey = `${additionalProblem.type}_${additionalProblem.answer}`;
+    
+    if (!problems.has(problemKey)) {
+      problems.add(problemKey);
+      result.push(additionalProblem);
+    }
+  }
+  
+  return result.slice(0, count);
+}
+
+/**
+ * 평수 변환 문제 후보 풀 생성
+ */
+function generateAreaCandidatePool(
+  rng: SeededRNG,
+  difficulty: Difficulty,
+  precision: number,
+  poolSize: number
+): AreaProblemData[] {
+  const candidates: AreaProblemData[] = [];
+  
+  for (let i = 0; i < poolSize; i++) {
+    candidates.push(generateSingleAreaProblem(rng, difficulty, precision));
+  }
+  
+  return candidates;
+}
+
+/**
+ * 단일 평수 변환 문제 생성
+ */
+function generateSingleAreaProblem(
+  rng: SeededRNG,
+  difficulty: Difficulty,
+  precision: number
+): AreaProblemData {
+  const isPyeongToSqm = rng.next() > 0.5;
+  
+  if (isPyeongToSqm) {
+    // 평수→제곱미터 문제에서는 정수 제곱미터가 나오는 평수들만 사용
+    const pyeongAmount = generateIntegerSqmPyeong(rng, difficulty);
+    const answer = Math.round(pyeongAmount * PYEONG_TO_SQM_RATIO);
+    
+    return {
+      type: 'PYEONG_TO_SQM',
+      pyeongAmount,
+      answer
+    };
+  } else {
+    const sqmAmount = generateSqmAmount(rng, difficulty);
+    const answer = sqmAmount / PYEONG_TO_SQM_RATIO;
+    
+    return {
+      type: 'SQM_TO_PYEONG',
+      sqmAmount,
+      answer: Number(answer.toFixed(precision))
+    };
+  }
+}
 
 /**
  * 정수 제곱미터가 나오는 평수들만 생성
@@ -48,32 +143,29 @@ export function generateAreaQuestions(
   const rng = new SeededRNG(seed);
   const questions: Question[] = [];
 
+  // 중복되지 않는 문제 데이터들을 미리 생성
+  const uniqueProblems = generateUniqueAreaProblems(rng, difficulty, precision, questionCount);
+
+  // 생성된 문제 데이터들로 Question 객체 생성
   for (let i = 0; i < questionCount; i++) {
-    const isPyeongToSqm = rng.next() > 0.5;
+    const problem = uniqueProblems[i];
     
-    if (isPyeongToSqm) {
-      // 평수→제곱미터 문제에서는 정수 제곱미터가 나오는 평수들만 사용
-      const pyeongAmount = generateIntegerSqmPyeong(rng, difficulty);
-      const answer = Math.round(pyeongAmount * PYEONG_TO_SQM_RATIO);
-      
+    if (problem.type === 'PYEONG_TO_SQM') {
       questions.push({
         id: `${seed}_area_p2s_${i}`,
         type: "PYEONG_TO_SQM",
-        prompt: `${pyeongAmount}평 = ?㎡`,
+        prompt: `${problem.pyeongAmount}평 = ?㎡`,
         icon: "📏",
-        answer: answer, // 정수
-        format: { decimals: 0 } // 소수점 없음
+        answer: problem.answer,
+        format: { decimals: 0 }
       });
     } else {
-      const sqmAmount = generateSqmAmount(rng, difficulty);
-      const answer = sqmAmount / PYEONG_TO_SQM_RATIO;
-      
       questions.push({
         id: `${seed}_area_s2p_${i}`,
         type: "SQM_TO_PYEONG",
-        prompt: `${sqmAmount}㎡ = ?평`,
+        prompt: `${problem.sqmAmount}㎡ = ?평`,
         icon: "📏",
-        answer: Number(answer.toFixed(precision)),
+        answer: problem.answer,
         format: { decimals: difficulty === "easy" ? 0 : precision }
       });
     }
@@ -81,8 +173,6 @@ export function generateAreaQuestions(
 
   return questions;
 }
-
-
 
 /**
  * 난이도에 따른 제곱미터 생성
