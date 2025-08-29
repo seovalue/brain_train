@@ -50,3 +50,14 @@ export type DailyQuizState = {
   startTime?: number;
   endTime?: number;
 };
+
+export type ReleaseNote = {
+  version: string;
+  date: string;
+  title: string;
+  changes: Array<{
+    type: '✨' | '🐛' | '⚡' | '🎨' | '🎮' | '📱' | '⚙️';
+    description: string;
+  }>;
+  isNew?: boolean;
+};

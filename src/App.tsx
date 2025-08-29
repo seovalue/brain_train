@@ -9,6 +9,7 @@ import { GameReaction } from './routes/GameReaction';
 import GameRPS from './routes/GameRPS';
 import { Result } from './routes/Result';
 import { Settings } from './routes/Settings';
+import { ReleaseNotes } from './routes/ReleaseNotes';
 import './index.css';
 
 function App() {
@@ -28,6 +29,7 @@ function App() {
             <Route path="/game/rps" element={<GameRPS />} />
             <Route path="/result" element={<Result />} />
             <Route path="/settings" element={<Settings />} />
+            <Route path="/release-notes" element={<ReleaseNotes />} />
           </Routes>
         </div>
       </div>

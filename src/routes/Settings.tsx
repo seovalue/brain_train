@@ -2,6 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ConsoleWindow } from '../components/ConsoleWindow';
 import { useSettingsStore } from '../stores/settings';
+import { APP_VERSION } from '../lib/releaseNotes';
 
 export const Settings: React.FC = () => {
   const navigate = useNavigate();
@@ -78,34 +79,27 @@ export const Settings: React.FC = () => {
       </ConsoleWindow>
 
       <p></p>
-      {/* 난이도 설정
-      <ConsoleWindow title="난이도 설정" className="mb-8 sm:mb-10 md:mb-12">
+      {/* 앱 정보 */}
+      <ConsoleWindow title="앱 정보" className="mb-6 sm:mb-8 md:mb-10">
         <div className="space-y-4 sm:space-y-6 md:space-y-8 p-4 sm:p-6 md:p-8">
-          <div>
-            <label className="block text-xs sm:text-sm mb-3 sm:mb-4 md:mb-5">게임 난이도</label>
-            <div className="flex gap-3 sm:gap-4 md:gap-5">
-              {difficulties.map((diff) => (
-                <button
-                  key={diff.value}
-                  className={`pixel-button flex-1 text-xs sm:text-sm md:text-base py-3 sm:py-4 md:py-5 transition-all duration-200 ${
-                    difficulty === diff.value 
-                      ? 'bg-console-green text-console-bg border-console-green shadow-lg transform scale-105' 
-                      : 'hover:border-console-green'
-                  }`}
-                  onClick={() => setDifficulty(diff.value)}
-                >
-                  {diff.label}
-                </button>
-              ))}
-            </div>
-            <p className="text-xs text-console-fg/70 mt-2">현재 설정: {difficulties.find(d => d.value === difficulty)?.label}</p>
+          <div className="text-center">
+            <p className="text-xs sm:text-sm md:text-base mb-2">현재 버전</p>
+            <p className="text-xs sm:text-sm md:text-base font-bold text-console-blue mb-4">{APP_VERSION}</p>
+            <button
+              className="pixel-button text-xs sm:text-sm md:text-base py-2 sm:py-3 md:py-4 px-4 sm:px-6 md:px-8"
+              onClick={() => navigate('/release-notes')}
+            >
+              📋 업데이트 내역 보기
+            </button>
+            <p></p>
           </div>
         </div>
-      </ConsoleWindow> */}
+      </ConsoleWindow>
 
-      {/* 저장 완료 메시지 */}
-      <div className="text-center text-xs sm:text-sm text-console-fg/70 mt-6 sm:mt-8 md:mt-10">
-        설정이 자동으로 저장됩니다
+      <p></p>
+      {/* 자동 저장 메시지 */}
+      <div className="text-center text-[8px] sm:text-[10px] md:text-xs text-console-fg/70 mb-4">
+        설정은 자동으로 저장됩니다.
       </div>
     </div>
   );

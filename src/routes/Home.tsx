@@ -4,6 +4,7 @@ import { track } from '@vercel/analytics';
 import { GameCard } from '../components/GameCard';
 import { useSettingsStore } from '../stores/settings';
 import { useDailyQuizStore } from '../stores/dailyQuiz';
+import { APP_VERSION, hasNewUpdates } from '../lib/releaseNotes';
 
 export const Home: React.FC = () => {
   const navigate = useNavigate();
@@ -117,8 +118,19 @@ export const Home: React.FC = () => {
       </div>
 
       <p></p>
-      {/* 설정 버튼 - 카드 하위 */}
-      <div className="text-right mb-4">
+      {/* 설정 및 업데이트 버튼 - 카드 하위 */}
+      <div className="flex justify-between items-center mb-4">
+        <button
+          className={`pixel-button px-4 sm:px-6 md:px-8 py-2 sm:py-3 md:py-4 text-xs sm:text-sm md:text-base shadow-lg relative ${
+            hasNewUpdates() ? 'border-console-red' : ''
+          }`}
+          onClick={() => navigate('/release-notes')}
+        >
+          📋 업데이트
+          {hasNewUpdates() && (
+            <span className="absolute -top-1 -right-1 w-2 h-2 bg-console-red rounded-full"></span>
+          )}
+        </button>
         <button
           className="pixel-button px-4 sm:px-6 md:px-8 py-2 sm:py-3 md:py-4 text-xs sm:text-sm md:text-base shadow-lg"
           onClick={() => navigate('/settings')}
@@ -132,7 +144,7 @@ export const Home: React.FC = () => {
       {/* Footer 영역 - 하단 여백 */}
       <div className="h-12 sm:h-16 md:h-20"></div>
       <div className="text-center text-[8px] sm:text-[10px] md:text-xs text-console-fg/40 pb-1">
-        @seovalue
+        {APP_VERSION} @seovalue
       </div>
     </div>
   );
