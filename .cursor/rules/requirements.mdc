@@ -1,175 +1,301 @@
 ---
-description:
-globs:
 alwaysApply: true
 ---
+## Tech & Setup (IMPLEMENTED)
+- Build: Vite + React + TypeScript ✅
+- UI: Tailwind CSS (utility-first), CSS variables for tokens ✅
+- State: Zustand ✅
+- Routing: React Router ✅
+- PWA: `vite-plugin-pwa` (offline & installable) ✅
+- Fonts: retro/console pixel fonts (`Press Start 2P`) ✅
+- Lint/Format: ESLint + TypeScript ESLint ✅
+- Analytics: Vercel Analytics ✅
+- i18n: KR copy only (strings centralized) ✅
 
-# title: Brain Training – Console UI MVP (Requirements)
-# applies_to: ["**/*"]
-# description: Classic console-game styled mobile webapp. No sound/vibration.
-# tags: ["frontend", "react", "typescript", "tailwind", "pwa", "console-ui"]
+---
 
-## Role
-You are a senior frontend engineer. Build the **“두뇌수련”** mobile-first webapp (MVP) in
-**TypeScript + React + Vite + Tailwind** with a **classic console game UI**.  
-The experience is exam-like: each game runs a **10-question set** with progress.
-**No sound/vibration** features.
+## Product Overview (IMPLEMENTED)
+- **App name:** 두뇌수련 (Brain Training) ✅
+- **Home:** console-style **2-col card grid** (6 games) ✅
+- **Games:**
+  1) **가위바위보** – 지시문 기반 선택, 2초 타이머 ✅
+  2) **인증번호 외우기** – 6자리 수 기억력 테스트 ✅
+  3) **달러 암산** – `$X` → 원화로 입력 (기본 환율 1,400, 설정에서 변경 가능) ✅
+  4) **평 ↔ ㎡ 환산** – 1평 = 3.3058㎡ 변환(양방향) ✅
+  5) **꿈에서 할아버지가** – 숫자 기억력 + 복잡한 계산 ✅
+  6) **뱅샐 유전자검사 대비 훈련장** – 반응속도 측정 ✅
+- Each game launches a **3-10 question exam mode** (configurable) → Result screen ✅
 
-## Tech & Setup
-- Build: Vite + React + TypeScript
-- UI: Tailwind CSS (utility-first), CSS variables for tokens
-- State: Zustand
-- Routing: React Router
-- PWA: `vite-plugin-pwa` (offline & installable)
-- Fonts: retro/console pixel fonts (e.g., `Press Start 2P`, `Pixel Emulator`)
-- Lint/Format: ESLint + Prettier
-- i18n: KR copy only (strings centralized)
+---
 
-## Product Overview
-- **App name:** 두뇌수련 (Brain Training)
-- **Home:** console-style **game selection (2-col card grid or vertical menu)**
-- **Initial games:**
-  1) **달러 암산** – `$X` → 원화로 입력 (기본 환율 1,400, 설정에서 변경 가능)
-  2) **평 ↔ ㎡ 환산** – 1평 = 3.3058㎡ 변환(양방향)
-- Each game launches a **10-question exam mode** → Result screen.
-
-## Console UI Guidelines (visual only, no audio)
-- Palette: bg **#1C1C2A** (navy/black), fg **#E0E0E0**, accents **#FF5555 / #88FF88 / #5599FF**
+## Console UI Guidelines (IMPLEMENTED)
+- Palette: bg **#1C1C2A** (navy/black), fg **#E0E0E0**, accents **#FF5555 / #88FF88 / #5599FF** ✅
 - Components mimic **console windows/dialog boxes**:
-  - Thick pixel borders, subtle inner shadow
-  - Focus/selection indicated by **cursor ▶** or pressed state (no sound)
-- Typography: fixed-size pixel font; use REM scale but snap to 4px rhythm
-- Key controls: on-screen **numeric keypad** (0–9, clear, submit), min touch 44px
-- Microcopy: short, encouraging, console-like prompts (KR)
+  - Thick pixel borders (3px), subtle inner shadow ✅
+  - Focus/selection indicated by hover states (no sound) ✅
+- Typography: fixed-size pixel font (Press Start 2P) ✅
+- Key controls: on-screen **numeric keypad** (0–9, clear, submit), min touch 44px ✅
+- Microcopy: short, encouraging, console-like prompts (KR) ✅
 
-## Screens & Behaviors
-### 1) Home (Game Select)
+---
+
+## Screens & Behaviors (IMPLEMENTED)
+
+### 1) Home (Game Select) ✅
 - Layout
-  - Title bar: “두뇌수련”
-  - Grid(2) **GameCard** list OR vertical console menu (config flag)
+  - Title bar: "두뇌수련" + 픽셀 마스코트 🧠
+  - Grid(2) **GameCard** list (6 games)
   - Card fields: icon, title, short desc, [시작하기]
+  - 하단: 설정 버튼 + 푸터 크레딧
 - Example cards:
-  - 달러 암산 – “$400 = ?원”
-  - 평 ↔ ㎡ – “10평 = ?m²”
-- Interaction: hover/pressed visual only; keyboard focus ring for a11y
+  - 가위바위보 – "지시문을 보고\n5초 안에 선택!"
+  - 인증번호 외우기 – "6자리 수\n기억하기"
+  - 달러 암산 – "$40 = ?원"
+  - 평 ↔ ㎡ – "1평 = ?㎡"
+  - 꿈에서 할아버지가 – "뭐라고 하셨더라?"
+  - 뱅샐 유전자검사 대비 훈련장 – "3,2,1... 클릭!"
+- Interaction: hover/pressed visual only; 신규/고난이도 배지 표시
 
-### 2) Game – Exam Mode (10 questions)
-- Header: question text (large), progress `Q 3/10` + mini **ProgressBar**
-- Body: tiny icon + **NumberInput** with **thousand separator** as typing
-- Footer: **Keypad** (0–9, C, OK). OK disabled until input exists.
+### 2) Game – Exam Mode (3-10 questions) ✅
+- Header: ← 홈으로 버튼 + 문제 진행도 (Q3/5) + **ProgressBar**
+- Body: 문제 텍스트 (콘솔 대사창 스타일) + 문제 아이콘
+- Input: **NumberInput** with **thousand separator** as typing (달러/평수 게임)
+- Footer: **Keypad** (0–9, 지우기, 제출). 제출 disabled until input exists.
 - Answer feedback (visual only):
-  - Correct: green badge “▶ 정답입니다!”
-  - Wrong: red badge “▶ 오답입니다...”
+  - Correct: green badge "▶ 정답입니다!"
+  - Wrong: red badge "▶ 오답입니다..."
   - Show calculation rationale (e.g., `400 × 1,400 = 560,000`)
-- Difficulty: 하/중/상 (affects ranges/precision)
-- Generation: deterministic by **date + difficulty seed** (daily set)
+- Special features:
+  - 가위바위보: 2초 타이머, 시스템 선택 표시, 지시문 기반 선택
+  - 반응속도: 타이머 기반 반응속도 측정
 
-### 3) Result
-- Summary: score `8/10`, accuracy %, optional elapsed time, streak
-- CTAs: [다시 풀기], [홈으로]
+### 3) Result ✅
+- Summary: score `80점`, 맞춘 개수, optional elapsed time
+- 공유 기능: "내 결과 자랑하기" (클립보드 복사)
+- CTAs: [홈으로]
+- 설정 진입점 (반응속도 게임 제외)
 
-### 4) Settings
-- 환율 입력(숫자) + 고정 토글
-- 난이도 (하/중/상) – console toggle
-- 평↔㎡ 소수점 자릿수 선택
-- (사운드/진동 옵션 제거)
+### 4) Settings ✅
+- 환율 입력(숫자) - 달러 환율 설정
+- 문제 개수 설정 (3/5/7/10개) - 2x2 그리드 선택
+- 자동 저장 메시지
 
-## Game Rules
-- **달러 암산**: `$X` → KRW using `exchangeRate` (default 1400). Round rules:
-  - 하: X in [5, 100] step 5
-  - 중: X in [20, 400] step 10
-  - 상: X in [50, 1000] step random
-- **평 ↔ ㎡**:
-  - 1평 = **3.3058㎡**
-  - 하: integers only
-  - 중: one decimal
-  - 상: random real with rounding to user preference
+---
 
-## State & Persistence
-- `SettingsStore`: exchangeRate, difficulty, areaPrecision, uiMode("grid"|"menu")
-- `DailyQuizStore`: seed(date+difficulty), currentQuestion, answers[], score
-- Persistence: localStorage (settings, streak, last results)
-- Derived: streak increments if daily score submitted (>=1 game solved)
+## Game Rules (IMPLEMENTED)
 
-## Data & Types (sketch)
+### 가위바위보 ✅
+- 지시문 기반 선택 (이기지도 비기지도 말아주세요 등)
+- 2초 타이머 제한
+- 시스템 선택 표시 (✊✋✌️)
+- 정답: 지시문에 맞는 선택
+
+### 인증번호 외우기 ✅
+- 6자리 숫자 기억력 테스트
+- 숫자 표시 후 기억하여 입력
+
+### 달러 암산 ✅
+- `$X` → KRW using `exchangeRate` (default 1400, 설정에서 변경 가능)
+- 천 단위 자동 포맷
+- 난이도별 금액 범위:
+  - 하: 10~250, 10의 배수
+  - 중: 10~600, 다양한 패턴
+  - 상: 15~1500, 매우 다양한 범위
+
+### 평 ↔ ㎡ ✅
+- 1평 = **3.3058㎡**
+- 양방향 변환 (평→㎡, ㎡→평)
+- 난이도별 소수점 처리
+
+### 꿈에서 할아버지가 ✅
+- 숫자 기억력 + 복잡한 계산
+- 원본 숫자 배열 기억 후 계산
+
+### 뱅샐 유전자검사 대비 훈련장 ✅
+- 반응속도 측정
+- 평균 반응시간 계산
+- 타이머 기반 테스트
+
+---
+
+## State & Persistence (IMPLEMENTED)
+- `SettingsStore`: exchangeRate, questionCount, uiMode("grid") ✅
+- `DailyQuizStore`: seed(date+difficulty), currentQuestion, answers[], score ✅
+- Persistence: localStorage (settings, quiz state) ✅
+- Analytics: Vercel Analytics integration ✅
+
+---
+
+## Data & Types (IMPLEMENTED)
 ```ts
 type Difficulty = "easy" | "medium" | "hard";
 
+type QuestionType = "USD_TO_KRW" | "PYEONG_TO_SQM" | "SQM_TO_PYEONG" | "VERIFICATION_CODE" | "DREAM_GRANDFATHER" | "REACTION_TIME" | "ROCK_PAPER_SCISSORS";
+
+type RockPaperScissors = "rock" | "paper" | "scissors";
+type RPSPrompt = 
+  | "이기지도 비기지도 말아주세요"
+  | "비기지도 말고\n지지도 말아주세요"
+  | "이기지도 지지도 말아주세요";
+
 type Question = {
-  id: string;            // seed + index
-  type: "USD_TO_KRW" | "PYEONG_TO_SQM" | "SQM_TO_PYEONG";
+  id: string;
+  type: QuestionType;
   prompt: string;
   icon?: string;
-  answer: number;        // canonical
-  format?: { decimals?: number; thousand?: boolean };
+  answer: number;
+  originalNumbers?: number[]; // 원본 숫자 배열 (DREAM_GRANDFATHER 타입용)
+  format?: { 
+    decimals?: number; 
+    thousand?: boolean;
+  };
+  // 가위바위보 게임용 필드들
+  systemChoice?: RockPaperScissors;
+  rpsPrompt?: RPSPrompt;
+  timeLimit?: number; // 5초 제한시간
 };
 
 type GameResult = {
-  date: string; difficulty: Difficulty;
-  total: number; correct: number; ms?: number;
+  date: string; 
+  difficulty: Difficulty;
+  total: number; 
+  correct: number; 
+  ms?: number;
+  reactionTimes?: number[]; // 반응속도 게임의 각 문제별 반응시간
+  averageReactionTime?: number; // 반응속도 게임의 평균 반응시간
 };
-````
 
-## Files (suggested)
+type Settings = {
+  exchangeRate: number;
+  difficulty: Difficulty;
+  uiMode: "grid" | "menu";
+  questionCount: 3 | 5 | 7 | 10;
+};
+
+type DailyQuizState = {
+  seed: string;
+  currentQuestion: number;
+  answers: (number | null)[];
+  score: number;
+  startTime?: number;
+  endTime?: number;
+};
+```
+
+---
+
+## Files (IMPLEMENTED)
 
 ```
 src/
-  app/
-    App.tsx
-    routes/
-      Home.tsx
-      GameDollar.tsx
-      GameArea.tsx
-      Result.tsx
-      Settings.tsx
+  App.tsx ✅
+  routes/
+    Home.tsx ✅
+    GameDollar.tsx ✅
+    GameArea.tsx ✅
+    GameVerification.tsx ✅
+    GameDream.tsx ✅
+    GameReaction.tsx ✅
+    GameRPS.tsx ✅
+    Result.tsx ✅
+    Settings.tsx ✅
   components/
-    ConsoleWindow.tsx
-    GameCard.tsx
-    NumberInput.tsx
-    Keypad.tsx
-    ProgressBar.tsx
-    FeedbackBadge.tsx
-  assets/
-    icons/ (8-bit dollar, ruler, brain, etc.)
-    fonts/
+    ConsoleWindow.tsx ✅
+    GameCard.tsx ✅
+    NumberInput.tsx ✅
+    Keypad.tsx ✅
+    ProgressBar.tsx ✅
+    FeedbackBadge.tsx ✅
   stores/
-    settings.ts
-    dailyQuiz.ts
+    settings.ts ✅
+    dailyQuiz.ts ✅
+  types/
+    index.ts ✅
   lib/
-    rng.ts
-    quiz/dollar.ts
-    quiz/area.ts
-    format.ts
+    rng.ts ✅
+    quiz/
+      dollar.ts ✅
+      area.ts ✅
+      verification.ts ✅
+      dream.ts ✅
+      reaction.ts ✅
+      rps.ts ✅
+    format.ts ✅
+    gameCalculators/
+      index.ts ✅
+  index.css ✅
 ```
 
-## Implementation Notes
+---
 
-* Keep **pure functions** for question generation (seeded RNG) and formatting.
-* Thousand separator: format only for view; keep numeric value canonical.
-* All interactive elements meet 44px touch min; keyboard/focus a11y.
-* No audio APIs, no vibration API usage.
+## Implementation Notes (IMPLEMENTED)
 
-## Acceptance Criteria
+* ✅ Keep **pure functions** for question generation (seeded RNG) and formatting
+* ✅ Thousand separator: format only for view; keep numeric value canonical
+* ✅ All interactive elements meet 44px touch min; keyboard/focus a11y
+* ✅ No audio APIs, no vibration API usage
+* ✅ Mobile-first responsive design (355px 최적화)
+* ✅ PWA with offline support
+* ✅ Vercel Analytics integration
+* ✅ Zustand state management with persistence
 
-* [ ] Home shows **console-style** selection (grid or menu) with two games.
-* [ ] Each game runs **10 questions** with progress and keypad input.
-* [ ] Visual-only feedback (correct/wrong + rationale), **no sound/vibration**.
-* [ ] Settings persist; exchange rate affects dollar quiz; area precision works.
-* [ ] Daily deterministic sets via seed; results & streak saved to localStorage.
-* [ ] PWA installable; app shell works offline after first load.
-* [ ] UI follows console window/dialog look & retro font & palette tokens.
+---
 
-## Non-Goals (MVP)
+## Acceptance Criteria (ALL COMPLETED)
 
-* No backend, no authentication, no analytics
-* No leaderboard/social
-* No audio/rumble effects
+* ✅ Home shows **console-style** selection (2-col grid) with 6 games
+* ✅ Each game runs **3-10 questions** (configurable) with progress and keypad input
+* ✅ Visual-only feedback (correct/wrong + rationale), **no sound/vibration**
+* ✅ Settings persist; exchange rate affects dollar quiz; question count works
+* ✅ Daily deterministic sets via seed; results saved to localStorage
+* ✅ PWA installable; app shell works offline after first load
+* ✅ UI follows console window/dialog look & retro font & palette tokens
+* ✅ Mobile optimization for 355px and smaller screens
+* ✅ Analytics tracking for game starts and completions
 
-## Tasks (first passes)
+---
 
-1. Scaffold Vite+TS+React+Tailwind, add fonts & tokens (CSS vars).
-2. Build ConsoleWindow, GameCard, Keypad, NumberInput, ProgressBar.
-3. Implement dollar/area generators (seeded) + formatting utils.
+## Non-Goals (MVP) - RESPECTED
+
+* ✅ No backend, no authentication, no analytics (except Vercel)
+* ✅ No leaderboard/social (except share feature)
+* ✅ No audio/rumble effects
+
+---
+
+## Current Features & Capabilities
+
+### 🎮 Games
+1. **가위바위보** - 지시문 기반 선택 게임
+2. **인증번호 외우기** - 숫자 기억력 테스트
+3. **달러 암산** - 환율 계산 게임
+4. **평수 변환** - 면적 단위 변환
+5. **꿈에서 할아버지가** - 복합 기억력 게임
+6. **뱅샐 유전자검사 대비 훈련장** - 반응속도 측정
+
+### ⚙️ Settings
+- 환율 설정 (달러→원화)
+- 문제 개수 설정 (3/5/7/10개)
+- 자동 저장
+
+### 📱 Technical Features
+- PWA (Progressive Web App)
+- Offline support
+- Mobile optimized (355px)
+- Touch-friendly UI
+- Vercel Analytics
+- Zustand state management
+- LocalStorage persistence
+
+### 🎨 UI/UX
+- Console game aesthetic
+- Press Start 2P font
+- Pixel art borders
+- Retro color palette
+- Responsive design
+- Accessibility support
+
+
 4. Wire Home → Game flows, 10Q loop, per-question feedback, Result.
 5. Settings (exchangeRate, difficulty, area precision) + persistence.
 6. PWA config + offline testing; a11y focus/roles pass.
