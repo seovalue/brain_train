@@ -22,7 +22,10 @@ export const Result: React.FC = () => {
   // 반응속도 게임인지 확인 (gameType이 'reaction'인 경우)
   const isReactionGame = location.state?.gameType === 'reaction';
   
-  // 반응속도 게임의 경우 평균 반응속도 사용
+  // 숫자 순서 게임인지 확인 (gameType이 'numberSequence'인 경우)
+  const isNumberSequenceGame = location.state?.gameType === 'numberSequence';
+  
+  // 반응속도/숫자순서 게임의 경우 평균 반응속도 사용
   const averageReactionTime = result.averageReactionTime || 0;
 
   // 게임 완료 이벤트 추적
@@ -30,13 +33,13 @@ export const Result: React.FC = () => {
     if (result) {
       track('game_completed', {
         gameType: location.state?.gameType || 'unknown',
-        score: isReactionGame ? averageReactionTime : Math.round((result.correct / result.total) * 100),
+        score: (isReactionGame || isNumberSequenceGame) ? averageReactionTime : Math.round((result.correct / result.total) * 100),
         totalQuestions: result.total,
         correctAnswers: result.correct,
         timeSpent: result.ms ? Math.floor(result.ms / 1000) : 0,
       });
     }
-  }, [result, location.state?.gameType, isReactionGame, averageReactionTime]);
+  }, [result, location.state?.gameType, isReactionGame, isNumberSequenceGame, averageReactionTime]);
 
   const getScoreMessage = (score: number) => {
     if (score >= 90) return "🎉 완벽합니다!";
@@ -52,6 +55,13 @@ export const Result: React.FC = () => {
     return "💪 더 연습해보세요!";
   };
 
+  const getNumberSequenceMessage = (avgTime: number) => {
+    if (avgTime < 1.0) return "⚡ 놀라운 속도!";
+    if (avgTime < 1.5) return "👍 빠른 속도!";
+    if (avgTime < 2.0) return "😊 적절한 속도";
+    return "💪 시간 초과가 많았어요!";
+  };
+
   // 가위바위보 게임이고 80점 이상인지 확인
   const isRPSGame = location.state?.gameType === 'rps';
   const showBurningMode = isRPSGame && score >= 80;
@@ -63,20 +73,22 @@ export const Result: React.FC = () => {
           {/* 결과 헤더 */}
           <div className="text-center mb-6 sm:mb-8 md:mb-12">
             <h1 className="text-lg sm:text-xl md:text-2xl font-bold mb-2 sm:mb-3 md:mb-4">
-              {isReactionGame ? '반응속도 결과' : '오늘의 점수'}
+              {isReactionGame ? '반응속도 결과' : isNumberSequenceGame ? '숫자 순서 결과' : '오늘의 점수'}
             </h1>
             <div 
               className="font-black text-console-green mb-3 sm:mb-4 md:mb-6 tracking-wider drop-shadow-lg"
               style={{ 
-                fontSize: isReactionGame ? 'clamp(1.5rem, 6vw, 2.5rem)' : 'clamp(2rem, 8vw, 4rem)',
+                fontSize: (isReactionGame || isNumberSequenceGame) ? 'clamp(1.5rem, 6vw, 2.5rem)' : 'clamp(2rem, 8vw, 4rem)',
                 fontWeight: '900'
               }}
             >
-              {isReactionGame ? `${averageReactionTime.toFixed(3)}초` : `${score}점`}
+              {(isReactionGame || isNumberSequenceGame) ? `${averageReactionTime.toFixed(3)}초` : `${score}점`}
             </div>
             <p className="text-sm sm:text-base md:text-lg">
               {isReactionGame 
                 ? getReactionScoreMessage(averageReactionTime)
+                : isNumberSequenceGame
+                ? getNumberSequenceMessage(averageReactionTime)
                 : getScoreMessage(score)
               }
             </p>
@@ -86,9 +98,9 @@ export const Result: React.FC = () => {
           <div className="console-window mb-6 sm:mb-8 md:mb-12" style={{ padding: '2rem' }}>
             <div className="space-y-3 sm:space-y-4 md:space-y-6">
               <div className="flex justify-between items-center text-xs sm:text-sm md:text-base">
-                <span>{isReactionGame ? '평균 반응속도:' : '맞춘 개수:'}</span>
+                <span>{(isReactionGame || isNumberSequenceGame) ? '평균 속도:' : '맞춘 개수:'}</span>
                 <span className="font-bold">
-                  {isReactionGame 
+                  {(isReactionGame || isNumberSequenceGame)
                     ? `${averageReactionTime.toFixed(3)}초` 
                     : `${result.correct}/${result.total}`
                   }
@@ -114,6 +126,8 @@ export const Result: React.FC = () => {
                 onClick={() => {
                   const shareText = isReactionGame 
                     ? `반응속도 테스트 결과 평균 ${averageReactionTime.toFixed(3)}초를 기록했습니다!\n${result.total}번의 테스트를 완료했어요.\n당신도 반응속도를 테스트해보세요!⚡\n\nhttps://alwaysdo.xyz/`
+                    : isNumberSequenceGame
+                    ? `숫자 순서 게임에서 평균 ${averageReactionTime.toFixed(3)}초를 기록했습니다!\n${result.total}문제를 완료했어요.\n당신도 도전해보세요!🔢\n\nhttps://alwaysdo.xyz/`
                     : `두뇌를 수련한 결과 ${score}점을 획득했습니다!\n${result.correct}/${result.total} 문제를 맞췄어요.\n당신도 꾸준히 수련해보세요.🧠\n\nhttps://alwaysdo.xyz/`;
                   navigator.clipboard.writeText(shareText);
                   alert('공유 텍스트가 클립보드에 복사되었습니다!');
@@ -148,7 +162,7 @@ export const Result: React.FC = () => {
           </div>
 
           {/* 설정 진입점 */}
-          {!isReactionGame && 
+          {!isReactionGame && !isNumberSequenceGame && 
           <div className="mt-6 sm:mt-8 md:mt-10 text-center">
             <p className="text-xs sm:text-sm text-console-fg/70 mb-3 sm:mb-4">
               퀴즈 개수를 늘리고 싶다면?

@@ -33,7 +33,23 @@ export const ReleaseNotes: React.FC = () => {
       </div>
 
       {/* 하단 여백 */}
-      <div className="h-8 sm:h-12 md:h-16"></div>
+      <div className="text-center text-[8px] sm:text-[10px] md:text-xs text-console-fg/40 pb-1" style={{padding: '1rem'}}>
+        <a 
+          href="https://www.instagram.com/alwaysdo.xyz" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="transition-colors duration-200 underline decoration-dotted underline-offset-2"
+          style={{
+            color: '#f9a8d4',
+            textShadow: '0 0 4px rgba(236, 72, 153, 0.3)',
+            textDecoration: 'underline',
+            textDecorationStyle: 'dotted',
+            textDecorationColor: '#f9a8d4'
+          }}
+        >
+          @alwaysdo.xyz
+        </a>
+      </div>
     </div>
   );
 };

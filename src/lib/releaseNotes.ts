@@ -1,9 +1,18 @@
 import type { ReleaseNote } from '../types';
 
-export const APP_VERSION = 'v1.2.0';
-export const APP_BUILD_DATE = '2025-08-29';
+export const APP_VERSION = 'v1.3.0';
+export const APP_BUILD_DATE = '2025-08-30';
 
 export const releaseNotes: ReleaseNote[] = [
+  {
+    version: 'v1.3.0',
+    date: '2025.08.30',
+    title: '숫자 순서 누르기 게임 추가',
+    changes: [
+      { type: '🎮', description: '1부터 5까지 순서대로 누르는 게임이 추가됐어요.' },
+      { type: '⚡', description: '1초 안에 순서대로 눌러야 하는 긴장감 넘치는 게임!' },
+    ]
+  },
   {
     version: 'v1.2.0',
     date: '2025.08.29',
@@ -39,9 +48,4 @@ export const hasNewUpdates = (): boolean => {
 // 현재 버전을 마지막으로 본 버전으로 저장
 export const markVersionAsViewed = (): void => {
   localStorage.setItem('last-viewed-version', APP_VERSION);
-};
-
-// 최신 릴리즈 노트 가져오기
-export const getLatestReleaseNote = (): ReleaseNote | null => {
-  return releaseNotes.length > 0 ? releaseNotes[0] : null;
 };

@@ -95,11 +95,23 @@ export const Settings: React.FC = () => {
           </div>
         </div>
       </ConsoleWindow>
-
-      <p></p>
-      {/* 자동 저장 메시지 */}
-      <div className="text-center text-[8px] sm:text-[10px] md:text-xs text-console-fg/70 mb-4">
-        설정은 자동으로 저장됩니다.
+      
+      <div className="text-center text-[8px] sm:text-[10px] md:text-xs text-console-fg/40 pb-1" style={{padding: '1rem'}}>
+        <a 
+          href="https://www.instagram.com/alwaysdo.xyz" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="transition-colors duration-200 underline decoration-dotted underline-offset-2"
+          style={{
+            color: '#f9a8d4',
+            textShadow: '0 0 4px rgba(236, 72, 153, 0.3)',
+            textDecoration: 'underline',
+            textDecorationStyle: 'dotted',
+            textDecorationColor: '#f9a8d4'
+          }}
+        >
+          @alwaysdo.xyz
+        </a>
       </div>
     </div>
   );

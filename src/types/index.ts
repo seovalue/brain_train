@@ -1,6 +1,6 @@
 export type Difficulty = "easy" | "medium" | "hard";
 
-export type QuestionType = "USD_TO_KRW" | "PYEONG_TO_SQM" | "SQM_TO_PYEONG" | "VERIFICATION_CODE" | "DREAM_GRANDFATHER" | "REACTION_TIME" | "ROCK_PAPER_SCISSORS";
+export type QuestionType = "USD_TO_KRW" | "PYEONG_TO_SQM" | "SQM_TO_PYEONG" | "VERIFICATION_CODE" | "DREAM_GRANDFATHER" | "REACTION_TIME" | "ROCK_PAPER_SCISSORS" | "NUMBER_SEQUENCE";
 
 export type RockPaperScissors = "rock" | "paper" | "scissors";
 export type RPSPrompt = 
@@ -35,6 +35,9 @@ export type Question = {
   rpsBurningPrompt?: RPSBurningPrompt;
   timeLimit?: number; // 5초 제한시간
   isBurningMode?: boolean; // 초고난이도 모드 여부
+  // 숫자 순서 게임용 필드들
+  numberSequence?: number[]; // 1~5 순서 배열
+  numberPositions?: Array<{x: number, y: number}>; // 각 숫자의 위치
 };
 
 export type GameResult = {

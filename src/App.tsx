@@ -6,6 +6,7 @@ import { GameArea } from './routes/GameArea';
 import { GameVerification } from './routes/GameVerification';
 import { GameDream } from './routes/GameDream';
 import { GameReaction } from './routes/GameReaction';
+import { GameNumberSequence } from './routes/GameNumberSequence';
 import GameRPS from './routes/GameRPS';
 import GameRPSBurning from './routes/GameRPSBurning';
 import { Result } from './routes/Result';
@@ -28,6 +29,7 @@ function App() {
             <Route path="/game/verification" element={<GameVerification />} />
             <Route path="/game/dream" element={<GameDream />} />
             <Route path="/game/reaction" element={<GameReaction />} />
+            <Route path="/game/number-sequence" element={<GameNumberSequence />} />
             <Route path="/game/rps" element={<GameRPS />} />
             <Route path="/game/rps-burning" element={<GameRPSBurning />} />
             <Route path="/result" element={<Result />} />
@@ -37,6 +39,7 @@ function App() {
           </Routes>
         </div>
       </div>
+      
       <Analytics />
     </Router>
   );

@@ -227,20 +227,16 @@ export default function GameRPSBurning() {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-2">
-      <div className="w-full max-w-[335px] h-[680px] flex flex-col">
-        <p></p>
-        <p></p>
-        
+      <div className="w-full max-w-[335px] h-[600px] flex flex-col">
         {/* 헤더 */}
         <div className="mb-2 flex-shrink-0">
           <button
             className="pixel-button mb-2 text-xs"
             onClick={() => navigate('/')}
+            style={{marginBottom: '1rem'}}
           >
             ← 홈으로
           </button>
-          <p></p>
-          <p></p>
           
           <div className="flex justify-between items-center mb-2">
             <span className="text-sm">문제 {currentQuestionIndex + 1}/{BURNING_QUESTION_COUNT}</span>

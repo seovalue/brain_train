@@ -37,6 +37,15 @@ export const Home: React.FC = () => {
       isNew: true,
     },
     {
+      id: 'numberSequence',
+      icon: '🔢',
+      title: '순서대로 \n숫자 누르기',
+      description: '1부터 5까지\n순서대로 누르기!',
+      path: '/game/number-sequence',
+      disabled: false,
+      isNew: true
+    },
+    {
       id: 'verification',
       icon: '📱',
       title: '인증번호\n외우기',
@@ -77,6 +86,15 @@ export const Home: React.FC = () => {
       description: '3,2,1... 클릭!',
       path: '/game/reaction',
       disabled: false
+    },
+    {
+      id: 'comingSoon',
+      icon: '⏳',
+      title: 'coming soon',
+      description: 'coming soon',
+      path: '/',
+      disabled: true,
+      comingSoon: true
     }
   ];
 
@@ -144,7 +162,22 @@ export const Home: React.FC = () => {
       {/* Footer 영역 - 하단 여백 */}
       <div className="h-12 sm:h-16 md:h-20"></div>
       <div className="text-center text-[8px] sm:text-[10px] md:text-xs text-console-fg/40 pb-1">
-        {APP_VERSION} @seovalue
+        {APP_VERSION}{' '}
+        <a 
+          href="https://www.instagram.com/alwaysdo.xyz" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="transition-colors duration-200 underline decoration-dotted underline-offset-2"
+          style={{
+            color: '#f9a8d4',
+            textShadow: '0 0 4px rgba(236, 72, 153, 0.3)',
+            textDecoration: 'underline',
+            textDecorationStyle: 'dotted',
+            textDecorationColor: '#f9a8d4'
+          }}
+        >
+          @alwaysdo.xyz
+        </a>
       </div>
     </div>
   );

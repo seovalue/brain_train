@@ -1,7 +1,7 @@
 import type { GameResult, Question } from '../../types';
 
-// 기본 게임 결과 계산
-export function calculateDefaultGameResult(
+// 기본 게임 결과 계산 (내부 헬퍼 함수)
+function calculateDefaultGameResult(
   answers: (number | null)[],
   score: number,
   totalTime: number
@@ -15,8 +15,8 @@ export function calculateDefaultGameResult(
   };
 }
 
-// 반응속도 게임 결과 계산
-export function calculateReactionGameResult(
+// 반응속도 게임 결과 계산 (내부 헬퍼 함수)
+function calculateReactionGameResult(
   reactionTimes: number[],
   totalTime: number
 ): GameResult {
@@ -47,6 +47,7 @@ export function calculateGameResult(
     case 'reaction':
       return calculateReactionGameResult(reactionTimes, totalTime);
     case 'rps':
+    case 'numberSequence':
       return calculateDefaultGameResult(answers, score, totalTime);
     default:
       return calculateDefaultGameResult(answers, score, totalTime);
@@ -60,8 +61,8 @@ export interface SubmitAnswerResult {
   newReactionTimes?: number[];
 }
 
-// 기본 게임 답변 제출
-export function submitDefaultAnswer(
+// 기본 게임 답변 제출 (내부 헬퍼 함수)
+function submitDefaultAnswer(
   answers: (number | null)[],
   score: number,
   currentIndex: number,
@@ -82,8 +83,8 @@ export function submitDefaultAnswer(
   };
 }
 
-// 반응속도 게임 답변 제출
-export function submitReactionAnswer(
+// 반응속도 게임 답변 제출 (내부 헬퍼 함수)
+function submitReactionAnswer(
   reactionTimes: number[],
   answer: number
 ): SubmitAnswerResult {
@@ -111,6 +112,7 @@ export function submitGameAnswer(
     case 'reaction':
       return submitReactionAnswer(reactionTimes, answer);
     case 'rps':
+    case 'numberSequence':
       return submitDefaultAnswer(answers, score, currentIndex, answer, question, isCorrect);
     default:
       return submitDefaultAnswer(answers, score, currentIndex, answer, question, isCorrect);

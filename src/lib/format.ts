@@ -1,14 +1,7 @@
 /**
- * 천 단위 구분자 추가
+ * 소수점 자릿수 지정 (내부 헬퍼 함수)
  */
-export function formatWithThousandSeparator(value: number): string {
-  return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-}
-
-/**
- * 소수점 자릿수 지정
- */
-export function formatDecimal(value: number, decimals: number = 0): string {
+function formatDecimal(value: number, decimals: number = 0): string {
   return value.toFixed(decimals);
 }
 
@@ -33,9 +26,9 @@ export function formatNumber(value: number, options: {
 }
 
 /**
- * 입력값에서 숫자만 추출
+ * 입력값에서 숫자만 추출 (내부 헬퍼 함수)
  */
-export function extractNumber(input: string): string {
+function extractNumber(input: string): string {
   return input.replace(/[^\d.]/g, '');
 }
 

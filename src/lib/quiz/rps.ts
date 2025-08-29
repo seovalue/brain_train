@@ -25,23 +25,9 @@ const RPS_BURNING_PROMPTS: RPSBurningPrompt[] = [
 
 const RPS_CHOICES: RockPaperScissors[] = ["rock", "paper", "scissors"];
 
-// 가위바위보 승패 판정 함수
-export function getRPSResult(system: RockPaperScissors, user: RockPaperScissors): "win" | "lose" | "draw" {
-  if (system === user) return "draw";
-  
-  if (
-    (system === "rock" && user === "paper") ||
-    (system === "paper" && user === "scissors") ||
-    (system === "scissors" && user === "rock")
-  ) {
-    return "win";
-  }
-  
-  return "lose";
-}
 
-// 프롬프트에 따른 정답 계산
-export function getCorrectAnswer(system: RockPaperScissors, prompt: RPSPrompt): RockPaperScissors {
+// 프롬프트에 따른 정답 계산 (내부 헬퍼 함수)
+function getCorrectAnswer(system: RockPaperScissors, prompt: RPSPrompt): RockPaperScissors {
   switch (prompt) {
     case "이기지도 비기지도 말아주세요":
       // 이기지도 비기지도 말라는 것은 지라는 뜻
@@ -60,46 +46,8 @@ export function getCorrectAnswer(system: RockPaperScissors, prompt: RPSPrompt): 
   }
 }
 
-// 초고난이도 프롬프트에 따른 정답 계산
-export function getBurningCorrectAnswer(system: RockPaperScissors, prompt: RPSBurningPrompt): RockPaperScissors | null {
-  switch (prompt) {
-    // 기존 프롬프트들
-    case "이기지도 비기지도 말아주세요":
-      // 이기지도 비기지도 말라는 것은 지라는 뜻
-      return getLosingChoice(system);
-      
-    case "비기지도 말고\n지지도 말아주세요":
-      // 비기지도 말고 지지도 말라는 것은 이기라는 뜻
-      return getWinningChoice(system);
-      
-    case "이기지도 지지도 말아주세요":
-      // 이기지도 지지도 말라는 것은 비기라는 뜻
-      return system;
-      
-    // 초고난이도 프롬프트들
-    case "이기거나 지세요":
-      // 이기거나 지면 성공 (비기면 안됨)
-      return getWinningChoice(system) || getLosingChoice(system);
-      
-    case "아무것도 누르지 마세요":
-      // 아무것도 누르지 않으면 성공 (null 반환)
-      return null;
-      
-    case "지거나 비기세요":
-      // 지거나 비기면 성공 (이기면 안됨)
-      return getLosingChoice(system) || system;
-      
-    case "이기거나 비기세요":
-      // 이기거나 비기면 성공 (지면 안됨)
-      return getWinningChoice(system) || system;
-      
-    default:
-      return system;
-  }
-}
-
-// 초고난이도 프롬프트에 따른 모든 가능한 정답 반환
-export function getBurningAllCorrectAnswers(system: RockPaperScissors, prompt: RPSBurningPrompt): (RockPaperScissors | null)[] {
+// 초고난이도 프롬프트에 따른 모든 가능한 정답 반환 (내부 헬퍼 함수)
+function getBurningAllCorrectAnswers(system: RockPaperScissors, prompt: RPSBurningPrompt): (RockPaperScissors | null)[] {
   switch (prompt) {
     // 기존 프롬프트들 (단일 답안)
     case "이기지도 비기지도 말아주세요":
@@ -215,12 +163,6 @@ export function generateRPSBurningQuestion(seed: string, index: number, previous
     icon: "🔥", // 불 아이콘
     isBurningMode: true
   };
-}
-
-// 사용자 선택을 숫자로 변환
-export function userChoiceToNumber(choice: RockPaperScissors): number {
-  const choiceMap = { rock: 0, paper: 1, scissors: 2 };
-  return choiceMap[choice];
 }
 
 // 숫자를 사용자 선택으로 변환
