@@ -52,7 +52,9 @@ export const Result: React.FC = () => {
     return "💪 더 연습해보세요!";
   };
 
-
+  // 가위바위보 게임이고 80점 이상인지 확인
+  const isRPSGame = location.state?.gameType === 'rps';
+  const showBurningMode = isRPSGame && score >= 80;
 
   return (
     <>
@@ -119,6 +121,23 @@ export const Result: React.FC = () => {
               >
                🤝 내 결과 자랑하기 
               </button>
+
+            {/* 초고난이도 모드 버튼 */}
+            {showBurningMode && (
+              <button
+                className="pixel-button burning-button w-full text-xs sm:text-sm md:text-base py-3 sm:py-4"
+                onClick={() => {
+                  track('burning_mode_started', {
+                    previousScore: score,
+                    gameType: 'rps-burning'
+                  });
+                  navigate('/game/rps-burning');
+                }}
+                style={{ whiteSpace: 'pre-line', paddingTop: '10px', paddingBottom: '10px'}}
+              >
+                🔥 (고수를 위한 비밀 기능){'\n'}초고난이도 모드를 도전해보시겠어요?
+              </button>
+            )}
             
             <button
               className="pixel-button w-full text-xs sm:text-sm md:text-base py-3 sm:py-4 md:py-5"

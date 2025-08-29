@@ -300,3 +300,5 @@ src/
 5. Settings (exchangeRate, difficulty, area precision) + persistence.
 6. PWA config + offline testing; a11y focus/roles pass.
 
+- 코드를 작업하고 나서는 항상 requirements.mdc를 업데이트하세요.
+

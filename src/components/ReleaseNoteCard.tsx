@@ -36,7 +36,7 @@ export const ReleaseNoteCard: React.FC<ReleaseNoteCardProps> = ({ releaseNote })
         <div className="space-y-2 sm:space-y-3 md:space-y-4" style={{padding: '2px'}}>
           {releaseNote.changes.map((change, index) => (
             <div key={index} className="flex items-start gap-2" style={{padding: '2px'}}>
-              <span className="text-xs sm:text-sm md:text-base flex-shrink-0">
+              <span className="text-xs sm:text-sm md:text-base flex-shrink-0" style={{ marginRight: '7px'}}>
                 {change.type}
               </span>
               <span className="text-10px sm:text-[12px] md:text-xs text-console-fg/90">

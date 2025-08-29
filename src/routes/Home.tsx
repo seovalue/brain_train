@@ -30,8 +30,8 @@ export const Home: React.FC = () => {
     {
       id: 'rps',
       icon: '✊',
-      title: '가위바위보',
-      description: '지시문을 보고\n5초 안에 선택!',
+      title: '지시문\n가위바위보',
+      description: '고수에게는 BURNING MODE\n기회가 생겨요🚨',
       path: '/game/rps',
       disabled: false,
       isNew: true,

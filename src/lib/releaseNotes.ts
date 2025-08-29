@@ -1,16 +1,23 @@
 import type { ReleaseNote } from '../types';
 
-export const APP_VERSION = 'v1.1.0';
+export const APP_VERSION = 'v1.2.0';
 export const APP_BUILD_DATE = '2025-08-29';
 
 export const releaseNotes: ReleaseNote[] = [
   {
-    version: 'v1.1.0',
+    version: 'v1.2.0',
     date: '2025.08.29',
+    title: 'BURNING MODE 추가',
+    changes: [
+      { type: '🎮', description: '가위바위보 초고난이도 모드가 추가됐어요.' },
+    ]
+  },
+  {
+    version: 'v1.1.0',
+    date: '2025.08.28',
     title: '가위바위보 게임 추가',
     changes: [
-      { type: '🎮', description: '가위바위보 게임 추가' },
-      { type: '🎨', description: 'UI 개선' }
+      { type: '🎮', description: '가위바위보 게임이 출시됐어요.' },
     ]
   },
   {
@@ -18,9 +25,7 @@ export const releaseNotes: ReleaseNote[] = [
     date: '2025.08.27',
     title: '첫 출시',
     changes: [
-      { type: '🎮', description: '두뇌 수련 게임' },
-      { type: '📱', description: '모바일 최적화' },
-      { type: '⚙️', description: '설정 기능' }
+      { type: '🎮', description: '두뇌 수련 게임이 세상에 출시됐어요.' },
     ]
   }
 ];

@@ -4,9 +4,8 @@ import { ConsoleWindow } from '../components/ConsoleWindow';
 import { ProgressBar } from '../components/ProgressBar';
 import { FeedbackBadge } from '../components/FeedbackBadge';
 import { useDailyQuizStore } from '../stores/dailyQuiz';
-import { useSettingsStore } from '../stores/settings';
-import { generateRPSQuestion, numberToUserChoice, getRPSResultMessage, RPS_TIMEOUT_MS } from '../lib/quiz/rps';
-import type { RockPaperScissors, Question, RPSPrompt } from '../types';
+import { generateRPSBurningQuestion, numberToUserChoice, getRPSBurningResultMessage, RPS_BURNING_TIMEOUT_MS } from '../lib/quiz/rps';
+import type { RockPaperScissors, Question, RPSBurningPrompt } from '../types';
 
 const RPS_ICONS = {
   rock: "✊",
@@ -21,9 +20,11 @@ const RPS_NAMES = {
 };
 
 // 타임아웃 설정 (초 단위) - 라이브러리에서 가져온 값 사용
-const TIMEOUT_SECONDS = RPS_TIMEOUT_MS / 1000;
+const TIMEOUT_SECONDS = RPS_BURNING_TIMEOUT_MS / 1000;
+// 초고난이도 모드는 5문제 고정
+const BURNING_QUESTION_COUNT = 5;
 
-export default function GameRPS() {
+export default function GameRPSBurning() {
   const navigate = useNavigate();
   const { 
     seed, 
@@ -36,7 +37,6 @@ export default function GameRPS() {
     finishQuiz,
     resetQuiz
   } = useDailyQuizStore();
-  const { questionCount } = useSettingsStore();
   
   const [currentQuestionData, setCurrentQuestionData] = useState<Question | null>(null);
   const [selectedChoice, setSelectedChoice] = useState<RockPaperScissors | null>(null);
@@ -49,31 +49,32 @@ export default function GameRPS() {
 
   // 컴포넌트 마운트 시 store 초기화 및 게임 시작
   useEffect(() => {
-    console.log('GameRPS 마운트 - 현재 questions 길이:', questions.length);
+    console.log('GameRPSBurning 마운트 - 현재 questions 길이:', questions.length);
     console.log('현재 gameType:', useDailyQuizStore.getState().gameType);
-    console.log('설정된 questionCount:', questionCount);
     
     // 이전 게임 상태 정리
     resetQuiz();
     
     // 새로운 문제 생성
-    let previousPrompt: RPSPrompt | undefined;
-    const rpsQuestions = Array.from({ length: questionCount }, (_, i) => {
-      const question = generateRPSQuestion(seed, i, previousPrompt);
-      previousPrompt = question.rpsPrompt;
+    let previousPrompt: RPSBurningPrompt | undefined;
+    const rpsQuestions = Array.from({ length: BURNING_QUESTION_COUNT }, (_, i) => {
+      const question = generateRPSBurningQuestion(seed, i, previousPrompt);
+      previousPrompt = question.rpsBurningPrompt;
       return question;
     });
     
     console.log('생성된 문제 개수:', rpsQuestions.length);
-    console.log('문제들:', rpsQuestions.map(q => ({ id: q.id, prompt: q.rpsPrompt })));
+    console.log('문제들:', rpsQuestions.map(q => ({ id: q.id, prompt: q.rpsBurningPrompt })));
     
-    startQuiz(rpsQuestions, 'rps');
+    startQuiz(rpsQuestions, 'rps-burning');
   }, []); // 빈 의존성 배열로 마운트 시에만 실행
 
   // 현재 문제 데이터 설정
   useEffect(() => {
     if (storeCurrentQuestion) {
       setCurrentQuestionData(storeCurrentQuestion);
+      console.log('현재 문제 데이터:', storeCurrentQuestion);
+      console.log('프롬프트:', storeCurrentQuestion.rpsBurningPrompt);
     }
   }, [storeCurrentQuestion]);
 
@@ -115,11 +116,23 @@ export default function GameRPS() {
     // 이미 답변했음을 표시
     setIsAnswered(true);
 
-    const isAnswerCorrect = userChoice === numberToUserChoice(currentQuestionData.answer);
-    const message = getRPSResultMessage(
+    // 여러 답안이 가능한 경우 처리
+    const multipleAnswers = currentQuestionData.multipleAnswers;
+    let isAnswerCorrect = false;
+    
+    if (multipleAnswers && multipleAnswers.length > 0) {
+      // 여러 답안이 있는 경우, 사용자 답안이 정답 중 하나인지 확인
+      const userChoiceNumber = userChoiceToNumber(userChoice);
+      isAnswerCorrect = multipleAnswers.includes(userChoiceNumber);
+    } else {
+      // 단일 답안인 경우 기존 로직 사용
+      isAnswerCorrect = userChoice === numberToUserChoice(currentQuestionData.answer);
+    }
+
+    const message = getRPSBurningResultMessage(
       currentQuestionData.systemChoice!,
       userChoice,
-      currentQuestionData.rpsPrompt!
+      (currentQuestionData.prompt || currentQuestionData.rpsBurningPrompt) as RPSBurningPrompt
     );
 
     setFeedbackMessage(message);
@@ -136,15 +149,15 @@ export default function GameRPS() {
     nextQuestionTimeoutRef.current = setTimeout(() => {
       // 현재 상태를 직접 가져와서 사용
       const currentState = useDailyQuizStore.getState();
-      if (currentState.currentQuestionIndex < questionCount - 1) {
+      if (currentState.currentQuestionIndex < BURNING_QUESTION_COUNT - 1) {
         nextQuestion();
       } else {
         const result = finishQuiz();
-        navigate('/result', { state: { result, gameType: 'rps' } });
+        navigate('/burning-result', { state: { result, gameType: 'rps-burning' } });
       }
       nextQuestionTimeoutRef.current = null;
     }, 2000);
-  }, [currentQuestionData, selectedChoice, isAnswered, questionCount, navigate, submitAnswer, nextQuestion, finishQuiz]);
+  }, [currentQuestionData, selectedChoice, isAnswered, navigate, submitAnswer, nextQuestion, finishQuiz]);
 
   const handleChoiceSelect = useCallback((choice: RockPaperScissors) => {
     if (isAnswered) return;
@@ -159,7 +172,7 @@ export default function GameRPS() {
     
     const timer = setInterval(() => {
       setTimeLeft((prev) => {
-        if (prev <= 1) {
+        if (prev <= 0.1) {
           // 시간 초과 시 자동으로 오답 처리
           clearInterval(timer);
           
@@ -168,11 +181,23 @@ export default function GameRPS() {
           
           setIsAnswered(true);
           
-          // 시간 초과 처리 - handleAnswer와 분리
-          setFeedbackMessage("▶ 시간 초과입니다...");
-          setIsCorrect(false);
+          // "아무것도 누르지 마세요" 프롬프트인지 확인
+          const prompt = currentQuestionData?.prompt || currentQuestionData?.rpsBurningPrompt;
+          const isNoActionPrompt = prompt === "아무것도 누르지 마세요";
+          
+          let isTimeOutCorrect = false;
+          let timeOutMessage = "▶ 시간 초과입니다...";
+          
+          if (isNoActionPrompt) {
+            // "아무것도 누르지 마세요" 프롬프트에서는 시간 초과가 정답
+            isTimeOutCorrect = true;
+            timeOutMessage = "▶ 정답입니다!";
+          }
+          
+          setFeedbackMessage(timeOutMessage);
+          setIsCorrect(isTimeOutCorrect);
           setShowFeedback(true);
-          submitAnswer(-1, false); // -1은 오답을 의미
+          submitAnswer(-1, isTimeOutCorrect); // -1은 시간 초과를 의미
           
           // 이전 타이머가 있다면 정리
           if (nextQuestionTimeoutRef.current) {
@@ -182,25 +207,23 @@ export default function GameRPS() {
           nextQuestionTimeoutRef.current = setTimeout(() => {
             // 현재 상태를 직접 가져와서 사용
             const currentState = useDailyQuizStore.getState();
-            if (currentState.currentQuestionIndex < questionCount - 1) {
+            if (currentState.currentQuestionIndex < BURNING_QUESTION_COUNT - 1) {
               nextQuestion();
             } else {
               const result = finishQuiz();
-              navigate('/result', { state: { result, gameType: 'rps' } });
+              navigate('/burning-result', { state: { result, gameType: 'rps-burning' } });
             }
             nextQuestionTimeoutRef.current = null;
           }, 2000);
           
           return 0;
         }
-        return prev - 1;
+        return prev - 0.1;
       });
-    }, 1000);
+    }, 100);
 
     return () => clearInterval(timer);
-  }, [isAnswered, questionCount, navigate, submitAnswer, nextQuestion, finishQuiz]);
-
-
+  }, [isAnswered, navigate, submitAnswer, nextQuestion, finishQuiz, currentQuestionData]);
 
   return (
     <div className="min-h-screen flex items-center justify-center p-2">
@@ -220,27 +243,28 @@ export default function GameRPS() {
           <p></p>
           
           <div className="flex justify-between items-center mb-2">
-            <span className="text-sm">문제 {currentQuestionIndex + 1}/{questionCount}</span>
+            <span className="text-sm">문제 {currentQuestionIndex + 1}/{BURNING_QUESTION_COUNT}</span>
+            <span className="text-sm text-[#FF5555] font-bold">🔥 BURNING MODE</span>
           </div>
           
-          <ProgressBar current={currentQuestionIndex + 1} total={questionCount} />
+          <ProgressBar current={currentQuestionIndex + 1} total={BURNING_QUESTION_COUNT} />
         </div>
 
         {/* 타이머 */}
         <div className="mb-4 text-center flex-shrink-0">
           <div className="text-3xl font-pixel text-[#FF5555] mb-2">
-            {timeLeft}초
+            {timeLeft.toFixed(1)}초
           </div>
           <div className="w-full bg-[#2A2A3A] h-3 rounded">
             <div 
-              className="bg-[#FF5555] h-3 rounded transition-all duration-1000"
+              className="bg-[#FF5555] h-3 rounded transition-all duration-100"
               style={{ width: `${(timeLeft / TIMEOUT_SECONDS) * 100}%` }}
             />
           </div>
         </div>
 
         {/* 게임 영역 */}
-        <ConsoleWindow className="mb-4 flex-grow flex flex-col justify-center">
+        <ConsoleWindow className="mb-4 flex-grow flex flex-col justify-center border-2 border-[#FF5555] bg-[#2A1A1A]">
           {currentQuestionData && (
             <>
               {/* 시스템 선택 표시 */}
@@ -250,17 +274,17 @@ export default function GameRPS() {
                 </div>
               </div>
 
-                {/* 프롬프트 */}
-                <div className="mb-10 text-center">
-                  <div className="text-[1.2rem] font-pixel text-[#5599FF] mb-2 tracking-wider leading-tight">
-                    <p 
-                      className="font-bold text-shadow-pixel whitespace-pre-line"
-                      dangerouslySetInnerHTML={{ 
-                        __html: currentQuestionData.rpsPrompt + '!' 
-                      }}
-                    />
-                  </div>
+              {/* 프롬프트 */}
+              <div className="mb-10 text-center">
+                <div className="text-[1.2rem] font-pixel text-[#FF5555] mb-2 tracking-wider leading-tight">
+                  <p 
+                    className="font-bold text-shadow-pixel whitespace-pre-line"
+                    dangerouslySetInnerHTML={{ 
+                      __html: (currentQuestionData.prompt || currentQuestionData.rpsBurningPrompt || '') + '!' 
+                    }}
+                  />
                 </div>
+              </div>
 
               {/* 선택 옵션 */}
               <div className="mb-6">
@@ -273,8 +297,8 @@ export default function GameRPS() {
                       className={`
                         p-6 rounded border-2 font-pixel transition-all
                         ${selectedChoice === choice 
-                          ? 'border-[#88FF88] bg-[#2A3A2A] text-[#88FF88]' 
-                          : 'border-[#3A3A4A] bg-[#2A2A3A] hover:border-[#5599FF]'
+                          ? 'border-[#FF5555] bg-[#3A2A2A] text-[#FF5555]' 
+                          : 'border-[#4A3A3A] bg-[#3A2A2A] hover:border-[#FF5555] hover:bg-[#4A3A3A]'
                         }
                         ${isAnswered ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
                       `}

@@ -7,7 +7,9 @@ import { GameVerification } from './routes/GameVerification';
 import { GameDream } from './routes/GameDream';
 import { GameReaction } from './routes/GameReaction';
 import GameRPS from './routes/GameRPS';
+import GameRPSBurning from './routes/GameRPSBurning';
 import { Result } from './routes/Result';
+import { BurningResult } from './routes/BurningResult';
 import { Settings } from './routes/Settings';
 import { ReleaseNotes } from './routes/ReleaseNotes';
 import './index.css';
@@ -27,7 +29,9 @@ function App() {
             <Route path="/game/dream" element={<GameDream />} />
             <Route path="/game/reaction" element={<GameReaction />} />
             <Route path="/game/rps" element={<GameRPS />} />
+            <Route path="/game/rps-burning" element={<GameRPSBurning />} />
             <Route path="/result" element={<Result />} />
+            <Route path="/burning-result" element={<BurningResult />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="/release-notes" element={<ReleaseNotes />} />
           </Routes>
