@@ -127,7 +127,7 @@ export const Result: React.FC = () => {
                   const shareText = isReactionGame 
                     ? `반응속도 테스트 결과 평균 ${averageReactionTime.toFixed(3)}초를 기록했습니다!\n${result.total}번의 테스트를 완료했어요.\n당신도 반응속도를 테스트해보세요!⚡\n\nhttps://alwaysdo.xyz/`
                     : isNumberSequenceGame
-                    ? `숫자 순서 게임에서 평균 ${averageReactionTime.toFixed(3)}초를 기록했습니다!\n${result.total}문제를 완료했어요.\n당신도 도전해보세요!🔢\n\nhttps://alwaysdo.xyz/`
+                    ? `숫자 순서 맞추기에서 평균 ${averageReactionTime.toFixed(3)}초를 기록했습니다!\n${result.total}문제를 완료했어요.\n당신도 도전해보세요!🔢\n\nhttps://alwaysdo.xyz/`
                     : `두뇌를 수련한 결과 ${score}점을 획득했습니다!\n${result.correct}/${result.total} 문제를 맞췄어요.\n당신도 꾸준히 수련해보세요.🧠\n\nhttps://alwaysdo.xyz/`;
                   navigator.clipboard.writeText(shareText);
                   alert('공유 텍스트가 클립보드에 복사되었습니다!');
