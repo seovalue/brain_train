@@ -14,7 +14,7 @@ const TWO_IN_A_ROW_TYPE = "가로 2연석"; // 2연석 타입 (가로 2연석만
 const GRID_SIZES = [8, 10, 15, 20, 25]; // 각 라운드별 그리드 크기
 
 // 제한시간 설정
-const TIME_LIMITS = [5, 5, 3, 2, 2]; // 각 라운드별 제한시간
+const TIME_LIMITS = [4, 4, 2, 1, 1]; // 각 라운드별 제한시간
 
 type CellState = {
   isOccupied: boolean;
