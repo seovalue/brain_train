@@ -1,9 +1,17 @@
 import type { ReleaseNote } from '../types';
 
-export const APP_VERSION = 'v1.4.0';
-export const APP_BUILD_DATE = '2025-09-01';
+export const APP_VERSION = 'v1.5.0';
+export const APP_BUILD_DATE = '2025-09-02';
 
 export const releaseNotes: ReleaseNote[] = [
+  {
+    version: 'v1.5.0',
+    date: '2025.09.02',
+    title: '피해요! 자동차 게임 추가',
+    changes: [
+      { type: '🎮', description: '장애물을 피해 생존하는 게임이 추가됐어요.' },
+    ]
+  },
   {
     version: 'v1.4.0',
     date: '2025.09.01',

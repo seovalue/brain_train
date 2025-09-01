@@ -10,6 +10,7 @@ import { GameNumberSequence } from './routes/GameNumberSequence';
 import GameRPS from './routes/GameRPS';
 import GameRPSBurning from './routes/GameRPSBurning';
 import GameTwoInARow from './routes/GameTwoInARow';
+import { GameDriving } from './routes/GameDriving';
 import { Result } from './routes/Result';
 import { BurningResult } from './routes/BurningResult';
 import { Settings } from './routes/Settings';
@@ -34,6 +35,7 @@ function App() {
             <Route path="/game/rps" element={<GameRPS />} />
             <Route path="/game/rps-burning" element={<GameRPSBurning />} />
             <Route path="/game/two-in-a-row" element={<GameTwoInARow />} />
+            <Route path="/game/driving" element={<GameDriving />} />
             <Route path="/result" element={<Result />} />
             <Route path="/burning-result" element={<BurningResult />} />
             <Route path="/settings" element={<Settings />} />

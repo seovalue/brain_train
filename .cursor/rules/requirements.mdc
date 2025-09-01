@@ -16,7 +16,7 @@ alwaysApply: true
 
 ## Product Overview (IMPLEMENTED)
 - **App name:** 두뇌수련 (Brain Training) ✅
-- **Home:** console-style **2-col card grid** (7 games) ✅
+- **Home:** console-style **2-col card grid** (8 games) ✅
 - **Games:**
   1) **가위바위보** – 지시문 기반 선택, 2초 타이머 ✅
   2) **순서대로 숫자 누르기** – 1부터 5까지 순서대로 누르기 ✅
@@ -26,6 +26,7 @@ alwaysApply: true
   6) **꿈에서 할아버지가** – 숫자 기억력 + 복잡한 계산 ✅
   7) **뱅샐 유전자검사 대비 훈련장** – 반응속도 측정 ✅
   8) **2연석 찾기** – 가로/세로/대각선 2연석 찾기 (5라운드, 난이도 증가) ✅
+  9) **픽셀 드라이빙** – 3차선 도로에서 장애물 피하기, 20초 생존 ✅
 - Each game launches a **3-10 question exam mode** (configurable) → Result screen ✅
 
 ---
@@ -128,6 +129,15 @@ alwaysApply: true
 - ConsoleWindow 안에서 그리드가 벗어나지 않도록 최적화
 - 코드 중복 제거 및 변수 중앙 관리
 
+### 픽셀 드라이빙 ✅
+- 3차선 도로에서 장애물 피하기 게임
+- 20초 제한시간, 생존하면 성공
+- 좌우 화살표 버튼으로 차선 변경
+- 장애물은 랜덤하게 생성되며 같은 차선에 중복 생성되지 않음
+- 시간이 지날수록 점수 증가, 장애물 회피 보너스
+- 픽셀 아트 스타일의 차량과 도로 배경
+- 충돌 시 게임 오버, 성공 시 점수 표시
+
 ---
 
 ## State & Persistence (IMPLEMENTED)
@@ -212,6 +222,7 @@ src/
     GameRPS.tsx ✅
     GameRPSBurning.tsx ✅
     GameTwoInARow.tsx ✅
+    GameDriving.tsx ✅
     Result.tsx ✅
     Settings.tsx ✅
   components/
@@ -258,7 +269,7 @@ src/
 
 ## Acceptance Criteria (ALL COMPLETED)
 
-* ✅ Home shows **console-style** selection (2-col grid) with 8 games
+* ✅ Home shows **console-style** selection (2-col grid) with 9 games
 * ✅ Each game runs **3-10 questions** (configurable) with progress and keypad input
 * ✅ Visual-only feedback (correct/wrong + rationale), **no sound/vibration**
 * ✅ Settings persist; exchange rate affects dollar quiz; question count works
@@ -289,6 +300,7 @@ src/
 6. **꿈에서 할아버지가** - 복합 기억력 게임
 7. **뱅샐 유전자검사 대비 훈련장** - 반응속도 측정
 8. **2연석 찾기** - 가로/세로/대각선 2연석 찾기 (5라운드, 난이도 증가)
+9. **픽셀 드라이빙** - 3차선 도로에서 장애물 피하기 (20초 생존)
 
 ### ⚙️ Settings
 - 환율 설정 (달러→원화)

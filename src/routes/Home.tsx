@@ -5,6 +5,8 @@ import { GameCard } from '../components/GameCard';
 import { useSettingsStore } from '../stores/settings';
 import { useDailyQuizStore } from '../stores/dailyQuiz';
 import { APP_VERSION, hasNewUpdates } from '../lib/releaseNotes';
+import { BETA_GAMES } from '../lib/betaGames';
+import type { BetaGame } from '../lib/betaGames';
 
 export const Home: React.FC = () => {
   const navigate = useNavigate();
@@ -27,15 +29,24 @@ export const Home: React.FC = () => {
     difficulty?: 'easy' | 'medium' | 'hard';
     isNew?: boolean;
   }> = [
-    {
-      id: 'twoInARow',
-      icon: '⚾️',
-      title: '2연석\n줍줍 ⚾️',
-      description: '티켓팅 대비\n2연석 줍줍',
-      path: '/game/two-in-a-row',
-      disabled: false,
-      isNew: true
-    },
+    // {
+    //   id: 'twoInARow',
+    //   icon: '⚾️',
+    //   title: '2연석\n줍줍 ⚾️',
+    //   description: '티켓팅 대비\n2연석 줍줍',
+    //   path: '/game/two-in-a-row',
+    //   disabled: false,
+    //   isNew: true
+    // },
+    // {
+    //   id: 'driving',
+    //   icon: '🚗',
+    //   title: '픽셀\n드라이빙',
+    //   description: '장애물 피하기\n20초 생존!',
+    //   path: '/game/driving',
+    //   disabled: false,
+    //   isNew: true
+    // },
     {
       id: 'rps',
       icon: '✊',
@@ -51,7 +62,6 @@ export const Home: React.FC = () => {
       description: '1부터 5까지\n순서대로 누르기!',
       path: '/game/number-sequence',
       disabled: false,
-      isNew: true
     },
     {
       id: 'verification',
@@ -94,6 +104,15 @@ export const Home: React.FC = () => {
       description: '3,2,1... 클릭!',
       path: '/game/reaction',
       disabled: false
+    }, 
+    {
+      id: 'commingSoon',
+      icon: '🚧',
+      title: '준비중',
+      description: '준비중',
+      path: '/game/commingSoon',
+      disabled: true,
+      comingSoon: true
     }
   ];
 
@@ -107,6 +126,142 @@ export const Home: React.FC = () => {
         <p className="text-xs sm:text-sm text-console-fg/70">늘 두뇌를 수련하십시오.</p>
       </div>
 
+      {/* 베타 게임 배너 영역 - 픽셀 아트 게임 스타일 */}
+      {BETA_GAMES.length > 0 && (
+        <div className="mb-4 sm:mb-6 md:mb-8">
+          {/* 메인 배너 헤더 */}
+          <div 
+            className="relative mb-2 py-2 px-3 text-center"
+            style={{
+              background: 'linear-gradient(45deg, #FF6B6B, #4ECDC4, #45B7D1, #96CEB4)',
+              backgroundSize: '400% 400%',
+              animation: 'gradient 3s ease infinite',
+              border: '3px solid #FFD93D',
+              borderRadius: '0px',
+              boxShadow: 'inset 0 0 8px rgba(255, 217, 61, 0.4), 0 0 15px rgba(255, 217, 61, 0.2)'
+            }}
+          >
+            <div className="absolute top-0 right-0">
+              <span 
+                className="text-[10px] font-bold px-1 py-0.5"
+                style={{
+                  background: '#FF4757',
+                  color: '#FFFFFF',
+                  border: '1px solid #FFFFFF',
+                  borderRadius: '0px',
+                  textShadow: '1px 1px 0px #000000'
+                }}
+              >
+                🎮 BETA
+              </span>
+            </div>
+            <h3 
+              className="text-xs sm:text-sm font-bold"
+              style={{
+                color: '#FFFFFF',
+                textShadow: '2px 2px 0px #000000, -1px -1px 0px #000000, 1px -1px 0px #000000, -1px 1px 0px #000000',
+                fontFamily: 'Press Start 2P, monospace'
+              }}
+            >
+              ✨ NEW GAMES ✨
+            </h3>
+          </div>
+
+          {/* 게임 카드들 */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3">
+            {BETA_GAMES.map((game: BetaGame) => (
+              <div
+                key={game.id}
+                className="relative cursor-pointer transition-all duration-200 group"
+                style={{
+                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                  border: '3px solid #FFD93D',
+                  borderRadius: '0px',
+                  boxShadow: '4px 4px 0px #000000',
+                  padding: '12px'
+                }}
+                onClick={() => {
+                  track('beta_game_clicked', {
+                    gameType: game.id,
+                    gameTitle: game.title,
+                  });
+                  resetQuiz();
+                  navigate(game.path);
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                  e.currentTarget.style.boxShadow = '6px 6px 0px #000000';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0px)';
+                  e.currentTarget.style.boxShadow = '4px 4px 0px #000000';
+                }}
+              >
+                {/* NEW 뱃지 */}
+                <div 
+                  className="absolute -top-1 -right-1 text-[10px] font-bold px-1 py-0.5"
+                  style={{
+                    background: '#FF6B6B',
+                    color: '#FFFFFF',
+                    border: '1px solid #FFFFFF',
+                    borderRadius: '0px',
+                    textShadow: '1px 1px 0px #000000',
+                    transform: 'rotate(15deg)',
+                    zIndex: 10
+                  }}
+                >
+                  NEW
+                </div>
+
+                <div className="flex items-center space-x-3" style={{ paddingRight: '8px' }}>
+                  {/* 게임 아이콘 */}
+                  <div 
+                    className="text-2xl sm:text-3xl flex-shrink-0 relative"
+                    style={{
+                      filter: 'drop-shadow(2px 2px 0px #000000)',
+                      animation: 'bounce 2s infinite',
+                      zIndex: 20
+                    }}
+                  >
+                    {game.icon}
+                  </div>
+                  
+                  {/* 게임 정보 */}
+                  <div className="flex-1 min-w-0 text-center" style={{ marginTop: '2px' }}>
+                    <div 
+                      className="text-sm sm:text-base font-bold leading-tight"
+                      style={{
+                        color: '#FFFFFF',
+                        textShadow: '2px 2px 0px #000000, -1px -1px 0px #000000, 1px -1px 0px #000000, -1px 1px 0px #000000',
+                        fontFamily: 'Press Start 2P, monospace',
+                        whiteSpace: 'pre-line'
+                      }}
+                    >
+                      {game.title}
+                    </div>
+                  </div>
+                  
+                  {/* PLAY 버튼 */}
+                  <div 
+                    className="text-xs font-bold px-3 py-2 group-hover:animate-pulse"
+                    style={{
+                      background: '#4ECDC4',
+                      color: '#000000',
+                      border: '2px solid #FFFFFF',
+                      borderRadius: '0px',
+                      textShadow: 'none',
+                      fontFamily: 'Press Start 2P, monospace'
+                    }}
+                  >
+                    PLAY
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+      <p></p>
       {/* 게임 선택 카드 그리드 */}
       <div className="grid grid-cols-2 gap-2 sm:gap-3 md:gap-4 mb-4 sm:mb-6 md:mb-8">
         {games.map((game) => (
