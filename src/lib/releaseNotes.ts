@@ -1,9 +1,17 @@
 import type { ReleaseNote } from '../types';
 
-export const APP_VERSION = 'v1.3.0';
-export const APP_BUILD_DATE = '2025-08-30';
+export const APP_VERSION = 'v1.4.0';
+export const APP_BUILD_DATE = '2025-09-01';
 
 export const releaseNotes: ReleaseNote[] = [
+  {
+    version: 'v1.4.0',
+    date: '2025.09.01',
+    title: '2연석 찾기 게임 추가',
+    changes: [
+      { type: '🎮', description: '2연석을 찾는 게임이 추가됐어요.' },
+    ]
+  },
   {
     version: 'v1.3.0',
     date: '2025.08.30',
