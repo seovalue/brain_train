@@ -75,7 +75,7 @@ export const GameDriving: React.FC = () => {
             id: `obs-${Date.now()}-player`,
             lane: playerLane,
             y: -80,
-            speed: 2.5 + Math.random() * 1.5, // 속도 감소: 4-6 -> 2.5-4
+            speed: 3 + Math.random() * 2, // 속도: 3-5 px/frame
           });
           // 사용한 차선 제거
           const playerLaneIndex = availableLanes.indexOf(playerLane);
@@ -92,7 +92,7 @@ export const GameDriving: React.FC = () => {
             id: `obs-${Date.now()}-random`,
             lane: randomLane,
             y: -80,
-            speed: 2.5 + Math.random() * 1.5, // 속도 감소
+            speed: 3 + Math.random() * 2, // 속도: 3-5 px/frame
           });
         }
         
@@ -139,8 +139,10 @@ export const GameDriving: React.FC = () => {
     
     // 플레이어 차량 위치: bottom 70px = Y 380px~440px (height 60px)
     // 장애물 크기: height 70px
+    // 충돌 조건: 장애물의 하단(obs.y + 70)이 플레이어 상단(380) 이상이고
+    //          장애물의 상단(obs.y)이 플레이어 하단(440) 이하일 때
     const collision = obstacles.some(obs => 
-      obs.y >= 310 && 
+      obs.y + 70 >= 380 && 
       obs.y <= 440 && 
       obs.lane === playerLane
     );
