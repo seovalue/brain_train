@@ -123,7 +123,7 @@ export const Home: React.FC = () => {
       <div className="text-center mb-4 sm:mb-6 md:mb-8">
         <div className="pixel-mascot mx-auto mb-2 sm:mb-3 md:mb-4"></div>
         <h1 className="text-base sm:text-lg md:text-xl font-bold mb-1 sm:mb-2 md:mb-3">두뇌수련</h1>
-        <p className="text-xs sm:text-sm text-console-fg/70">늘 두뇌를 수련하십시오.</p>
+        <p className="text-xs sm:text-sm text-console-fg/70" style={{paddingBottom: '10px'}}>늘 두뇌를 수련하십시오.</p>
       </div>
 
       {/* 베타 게임 배너 영역 - 픽셀 아트 게임 스타일 */}

@@ -240,7 +240,7 @@ export const GameDriving: React.FC = () => {
     return (
       <div className="min-h-screen p-4 flex items-center justify-center bg-console-bg">
         <ConsoleWindow className="text-center p-8">
-          <h2 className="text-2xl font-bold mb-4">💥 충돌!</h2>
+          <h2 className="text-2xl font-bold mb-4">💥 대형사고!</h2>
           <p className="mb-2" style={{ paddingLeft: '10px', paddingRight: '10px' }}>차량과 충돌했습니다!</p>
           <p className="mb-2">피한 차량: {dodgedCars}대</p>
           <p className="mb-6 text-lg">점수: {score}점</p>
@@ -281,35 +281,6 @@ export const GameDriving: React.FC = () => {
           className="relative bg-gray-800 border-4 border-gray-900 rounded-lg overflow-hidden"
           style={{ height: '450px' }}
         >
-          {/* 차선 구분선 - 최상위 레이어 */}
-          <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 1000 }}>
-            {/* 1차선과 2차선 구분선 */}
-            <div
-              style={{
-                position: 'absolute',
-                left: '33.33%',
-                top: '0',
-                bottom: '0',
-                width: '0',
-                borderLeft: '4px dashed #ffffff',
-                zIndex: 1001
-              }}
-            />
-            
-            {/* 2차선과 3차선 구분선 */}
-            <div
-              style={{
-                position: 'absolute',
-                left: '66.67%',
-                top: '0',
-                bottom: '0',
-                width: '0',
-                borderLeft: '4px dashed #ffffff',
-                zIndex: 1001
-              }}
-            />
-          </div>
-
           {/* 장애물 차량들 */}
           {obstacles.map(obs => {
             const laneX = 16.67 + (obs.lane * 33.33);
@@ -351,14 +322,53 @@ export const GameDriving: React.FC = () => {
               </div>
             </div>
           </div>
+
+          {/* 차선 구분선 - 흰색 점선 */}
+          <div 
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '100%',
+              pointerEvents: 'none',
+              zIndex: 9999
+            }}
+          >
+            {/* 1차선과 2차선 구분선 */}
+            <div
+              style={{
+                position: 'absolute',
+                left: '33.33%',
+                top: 0,
+                width: '3px',
+                height: '100%',
+                background: 'repeating-linear-gradient(to bottom, white 0px, white 15px, transparent 15px, transparent 30px)',
+                transform: 'translateX(-50%)'
+              }}
+            />
+            
+            {/* 2차선과 3차선 구분선 */}
+            <div
+              style={{
+                position: 'absolute',
+                left: '66.67%',
+                top: 0,
+                width: '3px',
+                height: '100%',
+                background: 'repeating-linear-gradient(to bottom, white 0px, white 15px, transparent 15px, transparent 30px)',
+                transform: 'translateX(-50%)'
+              }}
+            />
+          </div>
         </div>
 
         {/* 컨트롤 */}
-        <div className="flex justify-center items-center gap-4 mt-4 pt-4">
+        <div className="flex justify-between items-center mt-4 pt-4" style={{paddingTop: '10px'}}>
           <button
             onClick={() => changeLane('left')}
             disabled={playerLane === 0}
-            className={`pixel-button w-16 h-16 text-2xl ${
+            className={`pixel-button w-20 h-20 text-3xl ${
               playerLane === 0 ? 'opacity-50 cursor-not-allowed' : ''
             }`}
           >
@@ -368,7 +378,7 @@ export const GameDriving: React.FC = () => {
           <button
             onClick={() => changeLane('right')}
             disabled={playerLane === 2}
-            className={`pixel-button w-16 h-16 text-2xl ${
+            className={`pixel-button w-20 h-20 text-3xl ${
               playerLane === 2 ? 'opacity-50 cursor-not-allowed' : ''
             }`}
           >
