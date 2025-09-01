@@ -16,14 +16,16 @@ alwaysApply: true
 
 ## Product Overview (IMPLEMENTED)
 - **App name:** 두뇌수련 (Brain Training) ✅
-- **Home:** console-style **2-col card grid** (6 games) ✅
+- **Home:** console-style **2-col card grid** (7 games) ✅
 - **Games:**
   1) **가위바위보** – 지시문 기반 선택, 2초 타이머 ✅
-  2) **인증번호 외우기** – 6자리 수 기억력 테스트 ✅
-  3) **달러 암산** – `$X` → 원화로 입력 (기본 환율 1,400, 설정에서 변경 가능) ✅
-  4) **평 ↔ ㎡ 환산** – 1평 = 3.3058㎡ 변환(양방향) ✅
-  5) **꿈에서 할아버지가** – 숫자 기억력 + 복잡한 계산 ✅
-  6) **뱅샐 유전자검사 대비 훈련장** – 반응속도 측정 ✅
+  2) **순서대로 숫자 누르기** – 1부터 5까지 순서대로 누르기 ✅
+  3) **인증번호 외우기** – 6자리 수 기억력 테스트 ✅
+  4) **달러 암산** – `$X` → 원화로 입력 (기본 환율 1,400, 설정에서 변경 가능) ✅
+  5) **평 ↔ ㎡ 환산** – 1평 = 3.3058㎡ 변환(양방향) ✅
+  6) **꿈에서 할아버지가** – 숫자 기억력 + 복잡한 계산 ✅
+  7) **뱅샐 유전자검사 대비 훈련장** – 반응속도 측정 ✅
+  8) **2연석 찾기** – 가로/세로/대각선 2연석 찾기 (5라운드, 난이도 증가) ✅
 - Each game launches a **3-10 question exam mode** (configurable) → Result screen ✅
 
 ---
@@ -116,6 +118,16 @@ alwaysApply: true
 - 평균 반응시간 계산
 - 타이머 기반 테스트
 
+### 2연석 찾기 ✅
+- 5라운드 구성, 각 라운드마다 난이도 증가
+- 가로 2연석만 찾기 (단순화)
+- 그리드 크기: 10×10 → 15×15 → 25×25 → 30×30 → 30×30
+- 제한시간: 10초 → 8초 → 5초 → 3초 → 1초
+- 실제 2연석을 클릭하여 찾기
+- 티켓팅 방식: 2연석과 떨어져 있는 개별 셀들도 존재
+- ConsoleWindow 안에서 그리드가 벗어나지 않도록 최적화
+- 코드 중복 제거 및 변수 중앙 관리
+
 ---
 
 ## State & Persistence (IMPLEMENTED)
@@ -130,7 +142,7 @@ alwaysApply: true
 ```ts
 type Difficulty = "easy" | "medium" | "hard";
 
-type QuestionType = "USD_TO_KRW" | "PYEONG_TO_SQM" | "SQM_TO_PYEONG" | "VERIFICATION_CODE" | "DREAM_GRANDFATHER" | "REACTION_TIME" | "ROCK_PAPER_SCISSORS";
+type QuestionType = "USD_TO_KRW" | "PYEONG_TO_SQM" | "SQM_TO_PYEONG" | "VERIFICATION_CODE" | "DREAM_GRANDFATHER" | "REACTION_TIME" | "ROCK_PAPER_SCISSORS" | "NUMBER_SEQUENCE" | "TWO_IN_A_ROW";
 
 type RockPaperScissors = "rock" | "paper" | "scissors";
 type RPSPrompt = 
@@ -196,7 +208,10 @@ src/
     GameVerification.tsx ✅
     GameDream.tsx ✅
     GameReaction.tsx ✅
+    GameNumberSequence.tsx ✅
     GameRPS.tsx ✅
+    GameRPSBurning.tsx ✅
+    GameTwoInARow.tsx ✅
     Result.tsx ✅
     Settings.tsx ✅
   components/
@@ -243,7 +258,7 @@ src/
 
 ## Acceptance Criteria (ALL COMPLETED)
 
-* ✅ Home shows **console-style** selection (2-col grid) with 6 games
+* ✅ Home shows **console-style** selection (2-col grid) with 8 games
 * ✅ Each game runs **3-10 questions** (configurable) with progress and keypad input
 * ✅ Visual-only feedback (correct/wrong + rationale), **no sound/vibration**
 * ✅ Settings persist; exchange rate affects dollar quiz; question count works
@@ -267,11 +282,13 @@ src/
 
 ### 🎮 Games
 1. **가위바위보** - 지시문 기반 선택 게임
-2. **인증번호 외우기** - 숫자 기억력 테스트
-3. **달러 암산** - 환율 계산 게임
-4. **평수 변환** - 면적 단위 변환
-5. **꿈에서 할아버지가** - 복합 기억력 게임
-6. **뱅샐 유전자검사 대비 훈련장** - 반응속도 측정
+2. **순서대로 숫자 누르기** - 1부터 5까지 순서대로 누르기
+3. **인증번호 외우기** - 숫자 기억력 테스트
+4. **달러 암산** - 환율 계산 게임
+5. **평수 변환** - 면적 단위 변환
+6. **꿈에서 할아버지가** - 복합 기억력 게임
+7. **뱅샐 유전자검사 대비 훈련장** - 반응속도 측정
+8. **2연석 찾기** - 가로/세로/대각선 2연석 찾기 (5라운드, 난이도 증가)
 
 ### ⚙️ Settings
 - 환율 설정 (달러→원화)

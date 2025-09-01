@@ -1,6 +1,6 @@
 export type Difficulty = "easy" | "medium" | "hard";
 
-export type QuestionType = "USD_TO_KRW" | "PYEONG_TO_SQM" | "SQM_TO_PYEONG" | "VERIFICATION_CODE" | "DREAM_GRANDFATHER" | "REACTION_TIME" | "ROCK_PAPER_SCISSORS" | "NUMBER_SEQUENCE";
+export type QuestionType = "USD_TO_KRW" | "PYEONG_TO_SQM" | "SQM_TO_PYEONG" | "VERIFICATION_CODE" | "DREAM_GRANDFATHER" | "REACTION_TIME" | "ROCK_PAPER_SCISSORS" | "NUMBER_SEQUENCE" | "TWO_IN_A_ROW";
 
 export type RockPaperScissors = "rock" | "paper" | "scissors";
 export type RPSPrompt = 

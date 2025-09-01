@@ -28,13 +28,21 @@ export const Home: React.FC = () => {
     isNew?: boolean;
   }> = [
     {
+      id: 'twoInARow',
+      icon: '⚾️',
+      title: '2연석\n줍줍 ⚾️',
+      description: '티켓팅 대비\n2연석 줍줍',
+      path: '/game/two-in-a-row',
+      disabled: false,
+      isNew: true
+    },
+    {
       id: 'rps',
       icon: '✊',
       title: '지시문\n가위바위보',
       description: '고수에게는 BURNING MODE\n기회가 생겨요🚨',
       path: '/game/rps',
       disabled: false,
-      isNew: true,
     },
     {
       id: 'numberSequence',
@@ -86,15 +94,6 @@ export const Home: React.FC = () => {
       description: '3,2,1... 클릭!',
       path: '/game/reaction',
       disabled: false
-    },
-    {
-      id: 'comingSoon',
-      icon: '⏳',
-      title: 'coming soon',
-      description: 'coming soon',
-      path: '/',
-      disabled: true,
-      comingSoon: true
     }
   ];
 
