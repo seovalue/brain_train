@@ -1,12 +1,12 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { track } from '@vercel/analytics';
-import { GameCard } from '../components/GameCard';
+import { GameListItem } from '../components/GameListItem';
+import { PromoBanner } from '../components/PromoBanner';
 import { useSettingsStore } from '../stores/settings';
 import { useDailyQuizStore } from '../stores/dailyQuiz';
 import { APP_VERSION, hasNewUpdates } from '../lib/releaseNotes';
 import { BETA_GAMES } from '../lib/betaGames';
-import type { BetaGame } from '../lib/betaGames';
 
 export const Home: React.FC = () => {
   const navigate = useNavigate();
@@ -38,15 +38,15 @@ export const Home: React.FC = () => {
     //   disabled: false,
     //   isNew: true
     // },
-    // {
-    //   id: 'driving',
-    //   icon: '🚗',
-    //   title: '픽셀\n드라이빙',
-    //   description: '장애물 피하기\n20초 생존!',
-    //   path: '/game/driving',
-    //   disabled: false,
-    //   isNew: true
-    // },
+    {
+      id: 'driving',
+      icon: '🚗',
+      title: '픽셀\n드라이빙',
+      description: '장애물 피하기\n20초 생존!',
+      path: '/game/driving',
+      disabled: false,
+      isNew: true
+    },
     {
       id: 'rps',
       icon: '✊',
@@ -116,175 +116,56 @@ export const Home: React.FC = () => {
     }
   ];
 
+  // 프로모 배너 대상: 우선 베타 게임 목록의 첫 항목, 없으면 isNew 표시된 게임
+  const promo = (BETA_GAMES && BETA_GAMES.length > 0)
+    ? { icon: BETA_GAMES[0].icon, title: BETA_GAMES[0].title, description: BETA_GAMES[0].description, path: BETA_GAMES[0].path, id: BETA_GAMES[0].id }
+    : (() => {
+        const g = games.find((x) => x.isNew && !x.disabled);
+        return g ? { icon: g.icon, title: g.title, description: g.description, path: g.path, id: g.id } : null;
+      })();
+
   return (
     <div className="min-h-screen p-2 sm:p-3 md:p-4 relative" style={{paddingBottom: '20px'}}>
       <p></p>
       {/* 픽셀 마스코트 */}
       <div className="text-center mb-4 sm:mb-6 md:mb-8">
         <div className="pixel-mascot mx-auto mb-2 sm:mb-3 md:mb-4"></div>
-        <h1 className="text-base sm:text-lg md:text-xl font-bold mb-1 sm:mb-2 md:mb-3">두뇌수련</h1>
-        <p className="text-xs sm:text-sm text-console-fg/70" style={{paddingBottom: '10px'}}>늘 두뇌를 수련하십시오.</p>
+        <h3 className="text-base sm:text-lg md:text-xl font-bold mb-0">두뇌수련</h3>
+        <p className="text-xs sm:text-sm text-console-fg/70 mt-0">늘 두뇌를 수련하십시오.</p>
       </div>
 
-      {/* 베타 게임 배너 영역 - 픽셀 아트 게임 스타일 */}
-      {BETA_GAMES.length > 0 && (
-        <div className="mb-4 sm:mb-6 md:mb-8">
-          {/* 메인 배너 헤더 */}
-          <div 
-            className="relative mb-2 py-2 px-3 text-center"
-            style={{
-              background: 'linear-gradient(45deg, #FF6B6B, #4ECDC4, #45B7D1, #96CEB4)',
-              backgroundSize: '400% 400%',
-              animation: 'gradient 3s ease infinite',
-              border: '3px solid #FFD93D',
-              borderRadius: '0px',
-              boxShadow: 'inset 0 0 8px rgba(255, 217, 61, 0.4), 0 0 15px rgba(255, 217, 61, 0.2)'
-            }}
-          >
-            <div className="absolute top-0 right-0">
-              <span 
-                className="text-[10px] font-bold px-1 py-0.5"
-                style={{
-                  background: '#FF4757',
-                  color: '#FFFFFF',
-                  border: '1px solid #FFFFFF',
-                  borderRadius: '0px',
-                  textShadow: '1px 1px 0px #000000'
-                }}
-              >
-                🎮 BETA
-              </span>
-            </div>
-            <h3 
-              className="text-xs sm:text-sm font-bold"
-              style={{
-                color: '#FFFFFF',
-                textShadow: '2px 2px 0px #000000, -1px -1px 0px #000000, 1px -1px 0px #000000, -1px 1px 0px #000000',
-                fontFamily: 'Press Start 2P, monospace'
-              }}
-            >
-              ✨ NEW GAMES ✨
-            </h3>
-          </div>
-
-          {/* 게임 카드들 */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3">
-            {BETA_GAMES.map((game: BetaGame) => (
-              <div
-                key={game.id}
-                className="relative cursor-pointer transition-all duration-200 group"
-                style={{
-                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                  border: '3px solid #FFD93D',
-                  borderRadius: '0px',
-                  boxShadow: '4px 4px 0px #000000',
-                  padding: '12px'
-                }}
-                onClick={() => {
-                  track('beta_game_clicked', {
-                    gameType: game.id,
-                    gameTitle: game.title,
-                  });
-                  resetQuiz();
-                  navigate(game.path);
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'translateY(-2px)';
-                  e.currentTarget.style.boxShadow = '6px 6px 0px #000000';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'translateY(0px)';
-                  e.currentTarget.style.boxShadow = '4px 4px 0px #000000';
-                }}
-              >
-                {/* NEW 뱃지 */}
-                <div 
-                  className="absolute -top-1 -right-1 text-[10px] font-bold px-1 py-0.5"
-                  style={{
-                    background: '#FF6B6B',
-                    color: '#FFFFFF',
-                    border: '1px solid #FFFFFF',
-                    borderRadius: '0px',
-                    textShadow: '1px 1px 0px #000000',
-                    transform: 'rotate(15deg)',
-                    zIndex: 10
-                  }}
-                >
-                  NEW
-                </div>
-
-                <div className="flex items-center space-x-3" style={{ paddingRight: '8px' }}>
-                  {/* 게임 아이콘 */}
-                  <div 
-                    className="text-2xl sm:text-3xl flex-shrink-0 relative"
-                    style={{
-                      filter: 'drop-shadow(2px 2px 0px #000000)',
-                      animation: 'bounce 2s infinite',
-                      zIndex: 20
-                    }}
-                  >
-                    {game.icon}
-                  </div>
-                  
-                  {/* 게임 정보 */}
-                  <div className="flex-1 min-w-0 text-center" style={{ marginTop: '2px' }}>
-                    <div 
-                      className="text-sm sm:text-base font-bold leading-tight"
-                      style={{
-                        color: '#FFFFFF',
-                        textShadow: '2px 2px 0px #000000, -1px -1px 0px #000000, 1px -1px 0px #000000, -1px 1px 0px #000000',
-                        fontFamily: 'Press Start 2P, monospace',
-                        whiteSpace: 'pre-line'
-                      }}
-                    >
-                      {game.title}
-                    </div>
-                  </div>
-                  
-                  {/* PLAY 버튼 */}
-                  <div 
-                    className="text-xs font-bold px-3 py-2 group-hover:animate-pulse"
-                    style={{
-                      background: '#4ECDC4',
-                      color: '#000000',
-                      border: '2px solid #FFFFFF',
-                      borderRadius: '0px',
-                      textShadow: 'none',
-                      fontFamily: 'Press Start 2P, monospace'
-                    }}
-                  >
-                    PLAY
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+      {/* 광고형 프로모 배너: 한 구좌 */}
+      {promo && (
+        <PromoBanner
+          icon={promo.icon}
+          title={promo.title}
+          description={promo.description}
+          cta="PLAY"
+          onClick={() => {
+            track('promo_clicked', { gameType: promo.id, gameTitle: promo.title });
+            resetQuiz();
+            navigate(promo.path);
+          }}
+        />
       )}
-      <p></p>
-      {/* 게임 선택 카드 그리드 */}
-      <div className="grid grid-cols-2 gap-2 sm:gap-3 md:gap-4 mb-4 sm:mb-6 md:mb-8">
-        {games.map((game) => (
-          <GameCard
+      {/* 스크롤 가능한 리스트뷰: 세로 높이를 더 줄여 내부 스크롤 */}
+      <div className="mb-4 sm:mb-6 md:mb-8 max-h-[45vh] overflow-y-auto pr-1 space-y-2">
+        {games.filter(g => !g.comingSoon).map((game) => (
+          <GameListItem
             key={game.id}
             icon={game.icon}
             title={game.title}
             description={game.description}
+            disabled={game.disabled}
+            difficulty={game.difficulty}
+            isNew={game.isNew}
             onClick={() => {
               if (!game.disabled) {
-                track('game_started', {
-                  gameType: game.id,
-                  gameTitle: game.title,
-                });
-                // 게임 시작 전 상태 초기화
+                track('game_started', { gameType: game.id, gameTitle: game.title });
                 resetQuiz();
                 navigate(game.path);
               }
             }}
-            disabled={game.disabled}
-            comingSoon={game.comingSoon}
-            difficulty={game.difficulty}
-            isNew={game.isNew}
           />
         ))}
       </div>
