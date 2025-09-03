@@ -23,13 +23,15 @@ export const GameDriving: React.FC = () => {
   const [playerLane, setPlayerLane] = useState<Lane>(1);
   const [obstacles, setObstacles] = useState<Obstacle[]>([]);
   const [pickups, setPickups] = useState<Pickup[]>([]);
+  // 최신 픽업 상태를 interval 콜백에서 안전하게 참조하기 위한 ref
+  const pickupsRef = useRef<Pickup[]>([]);
   const [timeLeft, setTimeLeft] = useState(20);
   const [gameState, setGameState] = useState<'ready' | 'playing' | 'success' | 'collision'>('ready');
   const [score, setScore] = useState(0);
   const [dodgedCars, setDodgedCars] = useState(0);
   const [coins, setCoins] = useState(0);
-  // Shield removed
-  const [scoreMultiplier, setScoreMultiplier] = useState(1);
+  // 코인 스폰 속도 제어(초당 최대 2개)
+  const coinSpawnTimesRef = useRef<number[]>([]);
   const gameAreaRef = useRef<HTMLDivElement | null>(null);
   const [gameHeight, setGameHeight] = useState<number>(450);
   const gameHeightRef = useRef<number>(450);
@@ -52,8 +54,8 @@ export const GameDriving: React.FC = () => {
     setScore(0);
     setDodgedCars(0);
     setCoins(0);
-    // reset states
-    setScoreMultiplier(1);
+    // reset coin spawn timestamps
+    coinSpawnTimesRef.current = [];
     lastFrameRef.current = null;
     elapsedRef.current = 0;
   }, []);
@@ -82,7 +84,7 @@ export const GameDriving: React.FC = () => {
       });
     }, 1000);
 
-    // 장애물 생성 - 플레이어 위치에 항상 하나 + 추가로 랜덤
+    // 장애물 생성 - 플레이어 위치에 항상 하나 + 추가로 더 많이 생성
     const obstacleGenerator = setInterval(() => {
       setObstacles(prev => {
         // 현재 화면 상단 근처에 장애물이 있는 차선 확인
@@ -90,10 +92,16 @@ export const GameDriving: React.FC = () => {
           .filter(obs => obs.y < 150)
           .map(obs => obs.lane);
         
-        // 사용 가능한 차선 확인
-        const availableLanes = [0, 1, 2].filter(
-          lane => !occupiedLanes.includes(lane as Lane)
-        );
+        // 코인이 존재하는 차선(코인 보호 구간): 코인이 플레이어 영역 위에 있을 때 해당 레인은 스폰 금지
+        const coinProtectedLanes = pickupsRef.current
+          // 보호 범위 70%
+          .filter(pk => pk.y < gameHeightRef.current * 0.7)
+          .map(pk => pk.lane);
+
+        // 사용 가능한 차선 확인 (장애물 상단 점유 + 코인 보호 레인 제외)
+        const availableLanes = [0, 1, 2]
+          .filter(lane => !occupiedLanes.includes(lane as Lane))
+          .filter(lane => !coinProtectedLanes.includes(lane as Lane)) as Lane[];
         
         if (availableLanes.length === 0) return prev;
         
@@ -113,26 +121,38 @@ export const GameDriving: React.FC = () => {
           availableLanes.splice(playerLaneIndex, 1);
         }
         
-        // 50% 확률로 추가 장애물 생성
-        if (Math.random() < 0.5 && availableLanes.length > 0) {
-          const randomLane = availableLanes[
+        // 항상 추가 장애물 1개 생성 (가능한 경우)
+        if (availableLanes.length > 0) {
+          const randomLane1 = availableLanes[
             Math.floor(Math.random() * availableLanes.length)
           ] as Lane;
-          
           newObstacles.push({
-            id: `obs-${Date.now()}-random`,
-            lane: randomLane,
+            id: `obs-${Date.now()}-extra1`,
+            lane: randomLane1,
             y: -(gameHeightRef.current * 0.16),
             speed: (gameHeightRef.current * 0.6) * (0.8 + Math.random() * 0.4),
           });
+          // 사용한 차선 제거
+          const idx = availableLanes.indexOf(randomLane1);
+          if (idx >= 0) availableLanes.splice(idx, 1);
         }
+
+        // 동시 생성 장애물은 최대 2레인까지만 생성
         
         return [...prev, ...newObstacles];
       });
-    }, 1500); // 생성 간격을 1000ms에서 1500ms로 증가
+    }, 1000); // 생성 간격을 1500ms -> 1000ms로 조정하여 밀도 증가
 
-    // 픽업 생성 (코인/실드)
+    // 코인 스폰 유틸: 최근 1초 내 스폰 수 제한(최대 2)
+    const canSpawnCoin = () => {
+      const now = Date.now();
+      coinSpawnTimesRef.current = coinSpawnTimesRef.current.filter(t => now - t < 1000);
+      return coinSpawnTimesRef.current.length < 2;
+    };
+
+    // 픽업 생성 (코인)
     const pickupGenerator = setInterval(() => {
+      if (!canSpawnCoin()) return; // 초당 최대 2개 제한
       setPickups(prev => {
         const createChance = Math.random();
         if (createChance >= 0.6) return prev; // 40% chance to spawn
@@ -150,12 +170,15 @@ export const GameDriving: React.FC = () => {
           y: -(gameHeightRef.current * 0.12),
           speed: (gameHeightRef.current * 0.5) * (0.9 + Math.random() * 0.3),
         };
+        // 스폰 기록 업데이트
+        coinSpawnTimesRef.current.push(Date.now());
         return [...prev, coin];
       });
     }, 1800);
 
     // ensure at least one early coin
     const firstCoinTimeout = setTimeout(() => {
+      if (!canSpawnCoin()) return; // 초당 최대 2개 제한
       setPickups(prev => {
         const spawnBand = gameHeightRef.current * 0.3;
         const occupied = obstacles
@@ -170,6 +193,8 @@ export const GameDriving: React.FC = () => {
           y: -(gameHeightRef.current * 0.12),
           speed: (gameHeightRef.current * 0.5),
         };
+        // 스폰 기록 업데이트
+        coinSpawnTimesRef.current.push(Date.now());
         return [...prev, coin];
       });
     }, 500);
@@ -191,7 +216,8 @@ export const GameDriving: React.FC = () => {
         const updated = prev
           .map(obs => ({
             ...obs,
-            y: obs.y + obs.speed * difficultyBoost * dt,
+            // 난이도 상승: 장애물 낙하 속도 8% 증가
+            y: obs.y + obs.speed * difficultyBoost * 1.08 * dt,
           }))
           .filter(obs => {
             if (obs.y > gameHeightRef.current) {
@@ -225,6 +251,11 @@ export const GameDriving: React.FC = () => {
     };
   }, [gameState, playerLane]);
 
+  // pickups 최신값을 ref에 동기화
+  useEffect(() => {
+    pickupsRef.current = pickups;
+  }, [pickups]);
+
   // 충돌 감지
   useEffect(() => {
     if (gameState !== 'playing') return;
@@ -234,13 +265,18 @@ export const GameDriving: React.FC = () => {
     const PLAYER_TOP = h - PLAYER_BOTTOM - PLAYER_H;
     const PLAYER_BOTTOM_Y = PLAYER_TOP + PLAYER_H;
 
-    // 장애물 충돌 체크
+    // 장애물 충돌 체크 (히트박스 관대함 적용)
     let collidedObstacleId: string | null = null;
     for (const obs of obstacles) {
       const OB_H = h * (70 / 450);
       const obTop = obs.y;
       const obBottom = obs.y + OB_H;
-      const verticalOverlap = obBottom >= PLAYER_TOP && obTop <= PLAYER_BOTTOM_Y;
+      // 너무 민감한 판정을 줄이기 위해 히트박스 축소(각 10%)
+      const obTopAdj = obTop + OB_H * 0.1;
+      const obBottomAdj = obBottom - OB_H * 0.1;
+      const playerTopAdj = PLAYER_TOP + PLAYER_H * 0.1;
+      const playerBottomAdj = PLAYER_BOTTOM_Y - PLAYER_H * 0.1;
+      const verticalOverlap = obBottomAdj >= playerTopAdj && obTopAdj <= playerBottomAdj;
       if (verticalOverlap && obs.lane === playerLane) {
         collidedObstacleId = obs.id;
         break;
@@ -262,7 +298,6 @@ export const GameDriving: React.FC = () => {
       if (verticalOverlap && p.lane === playerLane) {
         collectedIds.push(p.id);
         setCoins(c => c + 1);
-        setScoreMultiplier(m => m * 2);
       }
     }
     if (collectedIds.length > 0) {
@@ -270,15 +305,16 @@ export const GameDriving: React.FC = () => {
     }
   }, [obstacles, pickups, playerLane, gameState, gameHeight]);
 
-  // 점수 계산 (코인 배수 적용)
+  // 점수 계산 (코인당 +2점 적용)
   useEffect(() => {
     if (gameState === 'playing') {
       const timeScore = (20 - timeLeft) * 10;
       const dodgeScore = dodgedCars * 50;
       const base = timeScore + dodgeScore;
-      setScore(Math.floor(base * scoreMultiplier));
+      const coinBonus = coins * 2;
+      setScore(Math.floor(base + coinBonus));
     }
-  }, [timeLeft, dodgedCars, gameState, scoreMultiplier]);
+  }, [timeLeft, dodgedCars, gameState, coins]);
 
   // 차선 변경
   const changeLane = (direction: 'left' | 'right') => {
@@ -395,9 +431,6 @@ export const GameDriving: React.FC = () => {
             <div className="text-sm">점수: {score}</div>
             <div className="text-xs text-console-fg/70">피한차: {dodgedCars}</div>
             <div className="text-xs text-console-fg/70">🪙 코인: {coins}</div>
-            {scoreMultiplier > 1 && (
-              <div className="text-xs text-yellow-300 font-bold">배점 x{scoreMultiplier}</div>
-            )}
           </div>
         </div>
 
