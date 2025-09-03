@@ -11,16 +11,31 @@ type Obstacle = {
   y: number;
   speed: number;
 };
+type Pickup = {
+  id: string;
+  lane: Lane;
+  y: number;
+  speed: number;
+};
 
 export const GameDriving: React.FC = () => {
   const navigate = useNavigate();
   const [playerLane, setPlayerLane] = useState<Lane>(1);
   const [obstacles, setObstacles] = useState<Obstacle[]>([]);
+  const [pickups, setPickups] = useState<Pickup[]>([]);
   const [timeLeft, setTimeLeft] = useState(20);
   const [gameState, setGameState] = useState<'ready' | 'playing' | 'success' | 'collision'>('ready');
   const [score, setScore] = useState(0);
   const [dodgedCars, setDodgedCars] = useState(0);
+  const [coins, setCoins] = useState(0);
+  // Shield removed
+  const [scoreMultiplier, setScoreMultiplier] = useState(1);
+  const gameAreaRef = useRef<HTMLDivElement | null>(null);
+  const [gameHeight, setGameHeight] = useState<number>(450);
+  const gameHeightRef = useRef<number>(450);
   const gameLoopRef = useRef<number | null>(null);
+  const lastFrameRef = useRef<number | null>(null);
+  const elapsedRef = useRef<number>(0);
 
   // 게임 시작
   const startGame = useCallback(() => {
@@ -32,14 +47,29 @@ export const GameDriving: React.FC = () => {
     setGameState('playing');
     setPlayerLane(1);
     setObstacles([]);
+    setPickups([]);
     setTimeLeft(20);
     setScore(0);
     setDodgedCars(0);
+    setCoins(0);
+    // reset states
+    setScoreMultiplier(1);
+    lastFrameRef.current = null;
+    elapsedRef.current = 0;
   }, []);
 
   // 게임 루프
   useEffect(() => {
     if (gameState !== 'playing') return;
+
+    // 게임 영역 크기 측정 및 리사이즈 대응
+    const updateDimensions = () => {
+      const h = gameAreaRef.current?.clientHeight ?? 450;
+      setGameHeight(h);
+      gameHeightRef.current = h;
+    };
+    updateDimensions();
+    window.addEventListener('resize', updateDimensions);
 
     // 타이머
     const timer = setInterval(() => {
@@ -74,8 +104,9 @@ export const GameDriving: React.FC = () => {
           newObstacles.push({
             id: `obs-${Date.now()}-player`,
             lane: playerLane,
-            y: -80,
-            speed: 3 + Math.random() * 2, // 속도: 3-5 px/frame
+            y: -(gameHeightRef.current * 0.16),
+            // px per second
+            speed: (gameHeightRef.current * 0.6) * (0.8 + Math.random() * 0.4),
           });
           // 사용한 차선 제거
           const playerLaneIndex = availableLanes.indexOf(playerLane);
@@ -91,8 +122,8 @@ export const GameDriving: React.FC = () => {
           newObstacles.push({
             id: `obs-${Date.now()}-random`,
             lane: randomLane,
-            y: -80,
-            speed: 3 + Math.random() * 2, // 속도: 3-5 px/frame
+            y: -(gameHeightRef.current * 0.16),
+            speed: (gameHeightRef.current * 0.6) * (0.8 + Math.random() * 0.4),
           });
         }
         
@@ -100,66 +131,154 @@ export const GameDriving: React.FC = () => {
       });
     }, 1500); // 생성 간격을 1000ms에서 1500ms로 증가
 
+    // 픽업 생성 (코인/실드)
+    const pickupGenerator = setInterval(() => {
+      setPickups(prev => {
+        const createChance = Math.random();
+        if (createChance >= 0.6) return prev; // 40% chance to spawn
+        // avoid lanes with an obstacle near spawn zone
+        const spawnBand = gameHeightRef.current * 0.3;
+        const occupied = obstacles
+          .filter(o => o.y < spawnBand)
+          .map(o => o.lane);
+        const candidates = [0,1,2].filter(l => !occupied.includes(l as Lane)) as Lane[];
+        if (candidates.length === 0) return prev;
+        const lane = candidates[Math.floor(Math.random() * candidates.length)] as Lane;
+        const coin: Pickup = {
+          id: `pk-${Date.now()}`,
+          lane,
+          y: -(gameHeightRef.current * 0.12),
+          speed: (gameHeightRef.current * 0.5) * (0.9 + Math.random() * 0.3),
+        };
+        return [...prev, coin];
+      });
+    }, 1800);
+
+    // ensure at least one early coin
+    const firstCoinTimeout = setTimeout(() => {
+      setPickups(prev => {
+        const spawnBand = gameHeightRef.current * 0.3;
+        const occupied = obstacles
+          .filter(o => o.y < spawnBand)
+          .map(o => o.lane);
+        const candidates = [0,1,2].filter(l => !occupied.includes(l as Lane)) as Lane[];
+        if (candidates.length === 0) return prev;
+        const lane = candidates[Math.floor(Math.random() * candidates.length)] as Lane;
+        const coin: Pickup = {
+          id: `pk-${Date.now()}-first`,
+          lane,
+          y: -(gameHeightRef.current * 0.12),
+          speed: (gameHeightRef.current * 0.5),
+        };
+        return [...prev, coin];
+      });
+    }, 500);
+
     // 게임 업데이트 루프
-    const gameLoop = () => {
+    const gameLoop = (now: number) => {
+      if (lastFrameRef.current == null) {
+        lastFrameRef.current = now;
+      }
+      const dt = Math.min(0.05, (now - lastFrameRef.current) / 1000); // clamp to avoid spikes
+      lastFrameRef.current = now;
+
+      // difficulty scales with elapsed time (0 -> 1 over 20s)
+      elapsedRef.current += dt;
+      const progress = Math.min(1, elapsedRef.current / 20);
+      const difficultyBoost = 1 + progress * 0.5; // up to +50%
+
       setObstacles(prev => {
         const updated = prev
           .map(obs => ({
             ...obs,
-            y: obs.y + obs.speed,
+            y: obs.y + obs.speed * difficultyBoost * dt,
           }))
           .filter(obs => {
-            if (obs.y > 450) {
+            if (obs.y > gameHeightRef.current) {
               setDodgedCars(c => c + 1);
               return false;
             }
             return true;
           });
-        
         return updated;
       });
-      
+
+      setPickups(prev => prev
+        .map(p => ({ ...p, y: p.y + p.speed * dt }))
+        .filter(p => p.y <= gameHeightRef.current)
+      );
+
       gameLoopRef.current = requestAnimationFrame(gameLoop);
     };
-    
+
     gameLoopRef.current = requestAnimationFrame(gameLoop);
 
     return () => {
       clearInterval(timer);
       clearInterval(obstacleGenerator);
+      clearInterval(pickupGenerator);
+      clearTimeout(firstCoinTimeout);
       if (gameLoopRef.current) {
         cancelAnimationFrame(gameLoopRef.current);
       }
+      window.removeEventListener('resize', updateDimensions);
     };
-  }, [gameState, playerLane]); // playerLane 의존성 추가
+  }, [gameState, playerLane]);
 
   // 충돌 감지
   useEffect(() => {
     if (gameState !== 'playing') return;
-    
-    // 플레이어 차량 위치: bottom 70px = Y 380px~440px (height 60px)
-    // 장애물 크기: height 70px
-    // 충돌 조건: 장애물의 하단(obs.y + 70)이 플레이어 상단(380) 이상이고
-    //          장애물의 상단(obs.y)이 플레이어 하단(440) 이하일 때
-    const collision = obstacles.some(obs => 
-      obs.y + 70 >= 380 && 
-      obs.y <= 440 && 
-      obs.lane === playerLane
-    );
-    
-    if (collision) {
-      setGameState('collision');
-    }
-  }, [obstacles, playerLane, gameState]);
+    const h = gameHeight;
+    const PLAYER_H = h * (60 / 450);
+    const PLAYER_BOTTOM = h * (70 / 450);
+    const PLAYER_TOP = h - PLAYER_BOTTOM - PLAYER_H;
+    const PLAYER_BOTTOM_Y = PLAYER_TOP + PLAYER_H;
 
-  // 점수 계산
+    // 장애물 충돌 체크
+    let collidedObstacleId: string | null = null;
+    for (const obs of obstacles) {
+      const OB_H = h * (70 / 450);
+      const obTop = obs.y;
+      const obBottom = obs.y + OB_H;
+      const verticalOverlap = obBottom >= PLAYER_TOP && obTop <= PLAYER_BOTTOM_Y;
+      if (verticalOverlap && obs.lane === playerLane) {
+        collidedObstacleId = obs.id;
+        break;
+      }
+    }
+
+    if (collidedObstacleId) {
+      setGameState('collision');
+      return;
+    }
+
+    // 픽업 수집 체크 (coin only)
+    const collectedIds: string[] = [];
+    for (const p of pickups) {
+      const PK_H = h * (38 / 450);
+      const pTop = p.y;
+      const pBottom = p.y + PK_H;
+      const verticalOverlap = pBottom >= PLAYER_TOP && pTop <= PLAYER_BOTTOM_Y;
+      if (verticalOverlap && p.lane === playerLane) {
+        collectedIds.push(p.id);
+        setCoins(c => c + 1);
+        setScoreMultiplier(m => m * 2);
+      }
+    }
+    if (collectedIds.length > 0) {
+      setPickups(prev => prev.filter(pk => !collectedIds.includes(pk.id)));
+    }
+  }, [obstacles, pickups, playerLane, gameState, gameHeight]);
+
+  // 점수 계산 (코인 배수 적용)
   useEffect(() => {
     if (gameState === 'playing') {
       const timeScore = (20 - timeLeft) * 10;
       const dodgeScore = dodgedCars * 50;
-      setScore(timeScore + dodgeScore);
+      const base = timeScore + dodgeScore;
+      setScore(Math.floor(base * scoreMultiplier));
     }
-  }, [timeLeft, dodgedCars, gameState]);
+  }, [timeLeft, dodgedCars, gameState, scoreMultiplier]);
 
   // 차선 변경
   const changeLane = (direction: 'left' | 'right') => {
@@ -192,7 +311,7 @@ export const GameDriving: React.FC = () => {
         <ConsoleWindow className="text-center p-8">
           <h2 className="text-2xl font-bold mb-4">🚗 픽셀 드라이빙</h2>
           <div className="mb-6 text-console-fg/80">
-            <p className="mb-2" style={{ paddingLeft: '10px', paddingRight: '10px' }}>장애물을 피해 20초 동안 생존하세요!</p>
+            <p className="mb-2" style={{ paddingLeft: '10px', paddingRight: '10px' }}>장애물을 피해 20초 동안 생존하세요! 코인은 먹으면 점수가 올라가요.</p>
           </div>
           <div className="flex justify-center items-center">
             <button
@@ -275,17 +394,24 @@ export const GameDriving: React.FC = () => {
           <div className="text-right">
             <div className="text-sm">점수: {score}</div>
             <div className="text-xs text-console-fg/70">피한차: {dodgedCars}</div>
+            <div className="text-xs text-console-fg/70">🪙 코인: {coins}</div>
+            {scoreMultiplier > 1 && (
+              <div className="text-xs text-yellow-300 font-bold">배점 x{scoreMultiplier}</div>
+            )}
           </div>
         </div>
 
         {/* 게임 영역 */}
         <div 
+          ref={gameAreaRef}
           className="relative bg-gray-800 border-4 border-gray-900 rounded-lg overflow-hidden"
-          style={{ height: '450px' }}
+          style={{ height: 'min(60vh, 520px)', minHeight: '320px' }}
         >
           {/* 장애물 차량들 */}
           {obstacles.map(obs => {
             const laneX = 16.67 + (obs.lane * 33.33);
+            const carW = gameHeight * (50 / 450);
+            const carH = gameHeight * (70 / 450);
             return (
               <div
                 key={obs.id}
@@ -294,8 +420,8 @@ export const GameDriving: React.FC = () => {
                   left: `${laneX}%`,
                   top: `${obs.y}px`,
                   transform: 'translateX(-50%)',
-                  width: '50px',
-                  height: '70px',
+                  width: `${carW}px`,
+                  height: `${carH}px`,
                   zIndex: 500
                 }}
               >
@@ -305,15 +431,47 @@ export const GameDriving: React.FC = () => {
             );
           })}
 
+          {/* 픽업들 (코인) */}
+          {pickups.map(pk => {
+            const laneX = 16.67 + (pk.lane * 33.33);
+            const w = gameHeight * (38 / 450);
+            const h = w; // coin is a circle
+            return (
+              <div
+                key={pk.id}
+                className="absolute flex items-center justify-center"
+                style={{
+                  left: `${laneX}%`,
+                  top: `${pk.y}px`,
+                  transform: 'translateX(-50%)',
+                  width: `${w}px`,
+                  height: `${h}px`,
+                  zIndex: 600
+                }}
+              >
+                <div
+                  className="rounded-full"
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    background: '#FFD700',
+                    border: '3px solid #7a4f07',
+                    boxShadow: '0 3px 6px rgba(0,0,0,0.35), inset 0 -2px 0 rgba(0,0,0,0.15)'
+                  }}
+                />
+              </div>
+            );
+          })}
+
           {/* 플레이어 차량 */}
           <div
             className="absolute transition-all duration-200"
             style={{
               left: `${16.67 + (playerLane * 33.33)}%`,
-              bottom: '70px',
+              bottom: `${gameHeight * (70 / 450)}px`,
               transform: 'translateX(-50%)',
-              width: '50px',
-              height: '60px',
+              width: `${gameHeight * (50 / 450)}px`,
+              height: `${gameHeight * (60 / 450)}px`,
             }}
           >
             {/* 차체 - 심플하게 */}
@@ -334,7 +492,7 @@ export const GameDriving: React.FC = () => {
               width: '100%',
               height: '100%',
               pointerEvents: 'none',
-              zIndex: 9999
+              zIndex: 100
             }}
           >
             {/* 1차선과 2차선 구분선 */}

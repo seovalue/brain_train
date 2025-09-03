@@ -1,4 +1,4 @@
-export interface BetaGame {
+export interface PromoGame {
   id: string;
   icon: string;
   title: string;
@@ -7,14 +7,7 @@ export interface BetaGame {
 }
 
 // 베타 게임들을 직접 상수로 관리
-export const BETA_GAMES: BetaGame[] = [
-  {
-    id: 'twoInARow',
-    icon: '⚾️',
-    title: '️2연석 줍줍 게임',
-    description: '',
-    path: '/game/two-in-a-row'
-  },
+export const PROMO_GAMES: PromoGame[] = [
   {
     id: 'driving',
     icon: '🚗',

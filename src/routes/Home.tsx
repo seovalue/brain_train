@@ -6,7 +6,7 @@ import { PromoBanner } from '../components/PromoBanner';
 import { useSettingsStore } from '../stores/settings';
 import { useDailyQuizStore } from '../stores/dailyQuiz';
 import { APP_VERSION, hasNewUpdates } from '../lib/releaseNotes';
-import { BETA_GAMES } from '../lib/betaGames';
+import { PROMO_GAMES } from '../lib/betaGames';
 
 export const Home: React.FC = () => {
   const navigate = useNavigate();
@@ -29,21 +29,12 @@ export const Home: React.FC = () => {
     difficulty?: 'easy' | 'medium' | 'hard';
     isNew?: boolean;
   }> = [
-    // {
-    //   id: 'twoInARow',
-    //   icon: '⚾️',
-    //   title: '2연석\n줍줍 ⚾️',
-    //   description: '티켓팅 대비\n2연석 줍줍',
-    //   path: '/game/two-in-a-row',
-    //   disabled: false,
-    //   isNew: true
-    // },
     {
-      id: 'driving',
-      icon: '🚗',
-      title: '픽셀\n드라이빙',
-      description: '장애물 피하기\n20초 생존!',
-      path: '/game/driving',
+      id: 'twoInARow',
+      icon: '⚾️',
+      title: '2연석\n줍줍 ⚾️',
+      description: '티켓팅 대비\n2연석 줍줍',
+      path: '/game/two-in-a-row',
       disabled: false,
       isNew: true
     },
@@ -117,8 +108,8 @@ export const Home: React.FC = () => {
   ];
 
   // 프로모 배너 대상: 우선 베타 게임 목록의 첫 항목, 없으면 isNew 표시된 게임
-  const promo = (BETA_GAMES && BETA_GAMES.length > 0)
-    ? { icon: BETA_GAMES[0].icon, title: BETA_GAMES[0].title, description: BETA_GAMES[0].description, path: BETA_GAMES[0].path, id: BETA_GAMES[0].id }
+  const promo = (PROMO_GAMES && PROMO_GAMES.length > 0)
+    ? { icon: PROMO_GAMES[0].icon, title: PROMO_GAMES[0].title, description: PROMO_GAMES[0].description, path: PROMO_GAMES[0].path, id: PROMO_GAMES[0].id }
     : (() => {
         const g = games.find((x) => x.isNew && !x.disabled);
         return g ? { icon: g.icon, title: g.title, description: g.description, path: g.path, id: g.id } : null;

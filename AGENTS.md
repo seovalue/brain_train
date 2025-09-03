@@ -1,3 +1,5 @@
+항상 한국어로 대답해줘. Always answering in KOREAN.
+
 # Repository Guidelines
 
 ## Project Structure & Module Organization
