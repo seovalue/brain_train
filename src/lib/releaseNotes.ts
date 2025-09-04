@@ -1,9 +1,17 @@
 import type { ReleaseNote } from '../types';
 
-export const APP_VERSION = 'v1.5.0';
-export const APP_BUILD_DATE = '2025-09-02';
+export const APP_VERSION = 'v1.6.0';
+export const APP_BUILD_DATE = '2025-09-05';
 
 export const releaseNotes: ReleaseNote[] = [
+  {
+    version: 'v1.6.0',  
+    date: '2025.09.05',
+    title: '출근길 두뇌훈련 게임 추가',
+    changes: [
+      { type: '🎮', description: '출근길 두뇌훈련 게임이 추가됐어요.' },
+    ]
+  },
   {
     version: 'v1.5.0',
     date: '2025.09.02',

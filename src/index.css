@@ -170,7 +170,7 @@ body {
   padding: 8px 16px;
   font-size: 0.8rem;
   text-align: center;
-  margin: 16px 0;
+  margin: 8px 0;
 }
 
 .feedback-correct {
@@ -196,6 +196,7 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  font-family: 'Press Start 2P', monospace;
   /* 모바일 더블탭 확대 방지 */
   touch-action: manipulation;
   -webkit-touch-callout: none;

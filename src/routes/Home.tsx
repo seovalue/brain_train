@@ -7,11 +7,14 @@ import { useSettingsStore } from '../stores/settings';
 import { useDailyQuizStore } from '../stores/dailyQuiz';
 import { APP_VERSION, hasNewUpdates } from '../lib/releaseNotes';
 import { PROMO_GAMES } from '../lib/betaGames';
+import { useCommuteSession } from '../stores/commuteSession';
+import { getSeoulDateKey } from '../lib/commute/date';
 
 export const Home: React.FC = () => {
   const navigate = useNavigate();
   const { uiMode } = useSettingsStore();
   const { resetQuiz } = useDailyQuizStore();
+  const { hasPlayedToday, dateKey, startAutoSession } = useCommuteSession();
 
   useEffect(() => {
     console.log('Home component mounted');
@@ -123,6 +126,33 @@ export const Home: React.FC = () => {
         <div className="pixel-mascot mx-auto mb-2 sm:mb-3 md:mb-4"></div>
         <h3 className="text-base sm:text-lg md:text-xl font-bold mb-0">두뇌수련</h3>
         <p className="text-xs sm:text-sm text-console-fg/70 mt-0">늘 두뇌를 수련하십시오.</p>
+      </div>
+
+      {/* 출근길 두뇌훈련 섹션 */}
+      <div className="console-window p-4 sm:p-5 mb-4 relative overflow-hidden" style={{ padding: '10px' }}>
+        <div className="flex items-center justify-between gap-3">
+          <div className="min-w-0">
+            <div className="text-lg sm:text-xl font-pixel font-bold mb-2 tracking-wide text-shadow-pixel flex items-center gap-2">
+              <span className="text-2xl" style={{paddingRight: '5px'}}>✍️ </span>
+              <span className="truncate">출근길 두뇌훈련</span>
+            </div>
+            <div className="text-xs sm:text-sm text-console-fg/80 leading-snug">
+              출근 전 두뇌 워밍업!
+            </div>
+          </div>
+          <button
+            className="pixel-button px-4 sm:px-6 py-2 sm:py-3 text-xs sm:text-sm font-bold"
+            onClick={() => { startAutoSession(); navigate('/commute/play'); }}
+            disabled={hasPlayedToday && dateKey === getSeoulDateKey()}
+          >
+            시작하기 ›
+          </button>
+        </div>
+        {(hasPlayedToday && dateKey === getSeoulDateKey()) && (
+          <div className="mt-2 sm:text-xs text-console-red" style={{fontSize: '12px'}}>내일 다시 만나요~</div>
+        )}
+        {/* 액센트 보더 강조 */}
+        <div className="absolute inset-0 pointer-events-none" style={{ boxShadow: 'inset 0 0 0 2px var(--console-blue)' }}></div>
       </div>
 
       {/* 광고형 프로모 배너: 한 구좌 */}

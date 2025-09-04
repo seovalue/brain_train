@@ -16,6 +16,8 @@ import { BurningResult } from './routes/BurningResult';
 import { Settings } from './routes/Settings';
 import { ReleaseNotes } from './routes/ReleaseNotes';
 import './index.css';
+import { CommutePlay } from './routes/commute/CommutePlay';
+import { CommuteResult } from './routes/commute/CommuteResult';
 
 function App() {
   return (
@@ -26,6 +28,8 @@ function App() {
         <div className="mx-auto max-w-[355px] min-h-screen bg-console-bg shadow-lg overflow-y-auto">
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/commute/play" element={<CommutePlay />} />
+            <Route path="/commute/result" element={<CommuteResult />} />
             <Route path="/game/dollar" element={<GameDollar />} />
             <Route path="/game/area" element={<GameArea />} />
             <Route path="/game/verification" element={<GameVerification />} />
