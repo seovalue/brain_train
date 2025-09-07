@@ -5,6 +5,7 @@ import { ProgressBar } from '../components/ProgressBar';
 import { FeedbackBadge } from '../components/FeedbackBadge';
 import { useDailyQuizStore } from '../stores/dailyQuiz';
 import type { Question } from '../types';
+import { useSEO } from '../lib/seo/useSEO';
 
 // 게임 설정
 const TOTAL_ROUNDS = 5;
@@ -24,6 +25,11 @@ type CellState = {
 
 export default function GameTwoInARow() {
   const navigate = useNavigate();
+  useSEO({
+    title: '2연석 줍줍 ⚾ - 티켓팅 훈련',
+    description: '야구장 2연석을 빠르게 찾아 클릭하는 집중력/시각 탐색 훈련 게임.',
+    robots: 'index,follow',
+  });
   const { 
     currentQuestionIndex, 
     currentQuestion: storeCurrentQuestion,

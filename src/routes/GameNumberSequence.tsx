@@ -6,11 +6,17 @@ import { FeedbackBadge } from '../components/FeedbackBadge';
 import { useSettingsStore } from '../stores/settings';
 import { useDailyQuizStore } from '../stores/dailyQuiz';
 import { generateNumberSequenceQuestions } from '../lib/quiz/numberSequence';
+import { useSEO } from '../lib/seo/useSEO';
 
 const GAME_TIME_LIMIT = 2000; // 2초 게임 시간
 
 export const GameNumberSequence: React.FC = () => {
   const navigate = useNavigate();
+  useSEO({
+    title: '숫자 순서 누르기 - 작업기억 훈련',
+    description: '1부터 목표 숫자까지 순서대로 빠르게 누르는 작업기억/집중력 게임.',
+    robots: 'index,follow',
+  });
   const { questionCount, difficulty } = useSettingsStore();
   const { 
     currentQuestionIndex, 

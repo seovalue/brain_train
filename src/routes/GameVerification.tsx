@@ -10,9 +10,15 @@ import { useSettingsStore } from '../stores/settings';
 import { generateVerificationCodeQuestions } from '../lib/quiz/verification';
 import { formatNumber } from '../lib/format';
 import { generateSeed, getTodayString } from '../lib/rng';
+import { useSEO } from '../lib/seo/useSEO';
 
 export const GameVerification: React.FC = () => {
   const navigate = useNavigate();
+  useSEO({
+    title: '인증번호 외우기 - 6자리 기억력',
+    description: '짧게 제시된 6자리 인증번호를 기억해 입력하는 집중력/단기기억 훈련 게임.',
+    robots: 'index,follow',
+  });
   const { questionCount, difficulty } = useSettingsStore();
   const { 
     currentQuestionIndex, 

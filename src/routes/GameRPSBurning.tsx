@@ -6,6 +6,7 @@ import { FeedbackBadge } from '../components/FeedbackBadge';
 import { useDailyQuizStore } from '../stores/dailyQuiz';
 import { generateRPSBurningQuestion, numberToUserChoice, getRPSBurningResultMessage, RPS_BURNING_TIMEOUT_MS } from '../lib/quiz/rps';
 import type { RockPaperScissors, Question, RPSBurningPrompt } from '../types';
+import { useSEO } from '../lib/seo/useSEO';
 
 const RPS_ICONS = {
   rock: "✊",
@@ -26,6 +27,11 @@ const BURNING_QUESTION_COUNT = 5;
 
 export default function GameRPSBurning() {
   const navigate = useNavigate();
+  useSEO({
+    title: 'BURNING MODE - 지시문 가위바위보 초고난이도',
+    description: '고수를 위한 초고난이도 지시문 가위바위보. 더 빠른 판단과 집중력을 요구합니다.',
+    robots: 'index,follow',
+  });
   const { 
     seed, 
     currentQuestionIndex, 

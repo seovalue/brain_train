@@ -2,11 +2,19 @@ import React, { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { track } from '@vercel/analytics';
 import type { GameResult } from '../types';
+import { useSEO } from '../lib/seo/useSEO';
 
 export const Result: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const result = location.state?.result as GameResult;
+
+  // SEO: 결과 화면은 검색 가치 낮음 → noindex 권장
+  useSEO({
+    title: '결과 - 오늘의 점수',
+    description: '게임 결과와 점수, 소요 시간 요약 화면.',
+    robots: 'noindex,follow',
+  });
 
 
   if (!result) {

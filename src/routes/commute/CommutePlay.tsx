@@ -6,9 +6,15 @@ import { TeamSplit } from '../../components/commute/games/TeamSplit';
 import { DeployCountdown } from '../../components/commute/games/DeployCountdown';
 import { SchedulingLite } from '../../components/commute/games/SchedulingLite';
 import { PrioritizationLite } from '../../components/commute/games/PrioritizationLite';
+import { useSEO } from '../../lib/seo/useSEO';
 
 export const CommutePlay: React.FC = () => {
   const nav = useNavigate();
+  useSEO({
+    title: '출근길 두뇌훈련 - 플레이',
+    description: '출근 전 두뇌 워밍업! 가벼운 미니 게임 연속 플레이 모드.',
+    robots: 'noindex,follow',
+  });
   const { selected, currentIndex, submitGameResult, nextGame, startAutoSession } = useCommuteSession();
   const id = selected[currentIndex];
 

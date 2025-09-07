@@ -2,11 +2,18 @@ import React, { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { track } from '@vercel/analytics';
 import type { GameResult } from '../types';
+import { useSEO } from '../lib/seo/useSEO';
 
 export const BurningResult: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const result = location.state?.result as GameResult;
+
+  useSEO({
+    title: 'BURNING MODE 결과',
+    description: '초고난이도 지시문 가위바위보 결과 화면.',
+    robots: 'noindex,follow',
+  });
 
   if (!result) {
     navigate('/');

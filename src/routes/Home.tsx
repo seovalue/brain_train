@@ -9,12 +9,20 @@ import { APP_VERSION, hasNewUpdates } from '../lib/releaseNotes';
 import { PROMO_GAMES } from '../lib/betaGames';
 import { useCommuteSession } from '../stores/commuteSession';
 import { getSeoulDateKey } from '../lib/commute/date';
+import { useSEO } from '../lib/seo/useSEO';
 
 export const Home: React.FC = () => {
   const navigate = useNavigate();
   const { uiMode } = useSettingsStore();
   const { resetQuiz } = useDailyQuizStore();
   const { hasPlayedToday, dateKey, startAutoSession } = useCommuteSession();
+
+  // SEO
+  useSEO({
+    title: '두뇌 훈련 미니게임 모음',
+    description: '가위바위보, 인증번호 외우기, 달러 암산, 평수 변환 등 성인을 위한 레트로 콘솔 감성의 두뇌 훈련 게임을 즐겨보세요.',
+    robots: 'index,follow',
+  });
 
   useEffect(() => {
     console.log('Home component mounted');

@@ -3,9 +3,16 @@ import { useNavigate } from 'react-router-dom';
 import { ConsoleWindow } from '../components/ConsoleWindow';
 import { useSettingsStore } from '../stores/settings';
 import { APP_VERSION } from '../lib/releaseNotes';
+import { useSEO } from '../lib/seo/useSEO';
 
 export const Settings: React.FC = () => {
   const navigate = useNavigate();
+  // 설정 화면은 검색 가치 낮음 → noindex 권장
+  useSEO({
+    title: '설정 - 환율/문제 개수',
+    description: '달러 환율과 게임당 문제 개수를 설정합니다.',
+    robots: 'noindex,follow',
+  });
   const {
     exchangeRate,
     questionCount,

@@ -2,9 +2,15 @@ import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ReleaseNoteCard } from '../components/ReleaseNoteCard';
 import { releaseNotes, markVersionAsViewed } from '../lib/releaseNotes';
+import { useSEO } from '../lib/seo/useSEO';
 
 export const ReleaseNotes: React.FC = () => {
   const navigate = useNavigate();
+  useSEO({
+    title: '업데이트 내역',
+    description: '두뇌수련 앱의 최신 업데이트 노트와 변경 사항.',
+    robots: 'noindex,follow',
+  });
 
   useEffect(() => {
     // 릴리즈 노트를 보면 현재 버전을 마지막으로 본 것으로 표시

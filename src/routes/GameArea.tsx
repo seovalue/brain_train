@@ -10,6 +10,7 @@ import { useDailyQuizStore } from '../stores/dailyQuiz';
 import { generateAreaQuestions, generateAreaRationale } from '../lib/quiz/area';
 import { generateSeed, getTodayString } from '../lib/rng';
 import { parseNumber } from '../lib/format';
+import { useSEO } from '../lib/seo/useSEO';
 import type { Difficulty } from '../types';
 
 /**
@@ -38,6 +39,11 @@ function getAreaTolerance(answer: number, difficulty: Difficulty): number {
 
 export const GameArea: React.FC = () => {
   const navigate = useNavigate();
+  useSEO({
+    title: '평수 변환 - 1평은 몇 ㎡?',
+    description: '1평 = 3.3058㎡ 규칙으로 평수/제곱미터를 변환하는 고난이도 암산 퀴즈. 반올림과 소수점 계산 연습.',
+    robots: 'index,follow',
+  });
   const { difficulty, questionCount } = useSettingsStore();
   const { 
     questions, 

@@ -1,5 +1,7 @@
 import React, { useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { track } from '@vercel/analytics';
+import { useSEO } from '../lib/seo/useSEO';
 
 type Stone = 0 | 1 | 2; // 0: empty, 1: black(player), 2: white(cpu)
 
@@ -380,6 +382,7 @@ const useOmok = () => {
   const [finished, setFinished] = useState(false);
   const [winner, setWinner] = useState<Stone | 0>(0);
   const [lastMove, setLastMove] = useState<{ x: number; y: number } | null>(null);
+  const [endReason, setEndReason] = useState<'five' | 'timeout' | 'draw' | null>(null);
 
   const emptyCount = useMemo(() => getAllEmpty(board).length, [board]);
 
@@ -389,6 +392,7 @@ const useOmok = () => {
     setFinished(false);
     setWinner(0);
     setLastMove(null);
+    setEndReason(null);
   };
 
   const place = (x: number, y: number, who: Stone): boolean => {
@@ -401,6 +405,7 @@ const useOmok = () => {
     if (checkWin(next, x, y, who)) {
       setFinished(true);
       setWinner(who);
+      setEndReason('five');
     }
     return true;
   };
@@ -418,6 +423,7 @@ const useOmok = () => {
     if (!pick) {
       setFinished(true);
       setWinner(0);
+      setEndReason('draw');
       return;
     }
     const ok = place(pick.x, pick.y, 2);
@@ -429,18 +435,26 @@ const useOmok = () => {
     if (!finished && turn === 1) {
       setFinished(true);
       setWinner(2); // 시간 초과 → 즉시 패배(CPU 승)
+      setEndReason('timeout');
     }
   };
 
-  return { board, turn, finished, winner, reset, playerPlay, cpuPlay, playerTimeout, emptyCount };
+  return { board, turn, finished, winner, reset, playerPlay, cpuPlay, playerTimeout, emptyCount, endReason };
 };
 
 export const GameOmok: React.FC = () => {
   const navigate = useNavigate();
-  const { board, turn, finished, winner, reset, playerPlay, cpuPlay, playerTimeout } = useOmok();
+  const { board, turn, finished, winner, reset, playerPlay, cpuPlay, playerTimeout, emptyCount, endReason } = useOmok();
   const MOVE_TIMEOUT_SEC = 20;
   const [timeLeft, setTimeLeft] = useState<number>(MOVE_TIMEOUT_SEC);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // SEO
+  useSEO({
+    title: '오목 - 교차점 착점 레트로 보드',
+    description: '13x13 보드에서 교차점에 돌을 두고 CPU와 겨루는 오목 게임. 레트로 콘솔 감성 UI와 접근 가능한 터치 인터랙션 지원.',
+    robots: 'index,follow',
+  });
 
   // CPU 차례 자동 둠 (간단한 턴 루프)
   React.useEffect(() => {
@@ -483,6 +497,24 @@ export const GameOmok: React.FC = () => {
       }
     };
   }, [turn, finished]);
+
+  // 게임 종료 시 승/패/무 및 종료 사유 트래킹
+  React.useEffect(() => {
+    if (!finished) return;
+    try {
+      const outcome = winner === 1 ? 'win' : winner === 2 ? 'lose' : 'draw';
+      const totalCells = BOARD_SIZE * BOARD_SIZE;
+      const movesPlayed = totalCells - (typeof emptyCount === 'number' ? emptyCount : 0);
+      track('game_completed', {
+        gameType: 'omok',
+        outcome,
+        reason: endReason ?? 'unknown',
+        movesPlayed,
+      });
+    } catch (e) {
+      // no-op: 분석 실패는 사용자 흐름에 영향 주지 않음
+    }
+  }, [finished, winner, endReason, emptyCount]);
 
   return (
     <div className="min-h-screen flex items-center justify-center p-2">

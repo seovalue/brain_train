@@ -1,0 +1,11 @@
+# Google AdSense authorized seller entry
+# Replace PUB_ID below with your AdSense publisher ID (numbers only, without the 'ca-' prefix).
+# Example AdSense publisher id in your account looks like: ca-pub-1234567890123456
+# In ads.txt, you must use: pub-1234567890123456
+
+google.com, pub-7058655993822497, DIRECT, f08c47fec0942fa0
+
+# Notes:
+# - Keep this file at the root: https://your-domain.com/ads.txt
+# - If you use other ad partners/resellers, add one line per partner as instructed by them.
+# - Changes can take a few days for AdSense to re-crawl.

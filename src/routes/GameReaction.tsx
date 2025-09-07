@@ -7,9 +7,15 @@ import { useDailyQuizStore } from '../stores/dailyQuiz';
 import { useSettingsStore } from '../stores/settings';
 import { generateReactionQuestions } from '../lib/quiz/reaction';
 import { generateSeed, getTodayString } from '../lib/rng';
+import { useSEO } from '../lib/seo/useSEO';
 
 export const GameReaction: React.FC = () => {
   const navigate = useNavigate();
+  useSEO({
+    title: '반응속도 측정 - 3,2,1... 클릭!',
+    description: '신호가 뜨면 즉시 클릭! 평균 반응속도를 측정하고 기록을 갱신해보세요.',
+    robots: 'index,follow',
+  });
   const { questionCount, difficulty } = useSettingsStore();
   const { 
     currentQuestionIndex, 

@@ -2,9 +2,15 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCommuteSession, COMMUTE_GAMES } from '../../stores/commuteSession';
 import { ConsoleWindow } from '../../components/ConsoleWindow';
+import { useSEO } from '../../lib/seo/useSEO';
 
 export const CommuteResult: React.FC = () => {
   const nav = useNavigate();
+  useSEO({
+    title: '출근길 두뇌훈련 - 결과',
+    description: '출근길 두뇌훈련 플레이 결과 요약.',
+    robots: 'noindex,follow',
+  });
   const { results } = useCommuteSession();
 
   const isCorrect = (r: (typeof results)[number]): boolean => {

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ConsoleWindow } from '../components/ConsoleWindow';
 import { ProgressBar } from '../components/ProgressBar';
 import { track } from '@vercel/analytics';
+import { useSEO } from '../lib/seo/useSEO';
 
 type Lane = 0 | 1 | 2;
 type Obstacle = {
@@ -20,6 +21,11 @@ type Pickup = {
 
 export const GameDriving: React.FC = () => {
   const navigate = useNavigate();
+  useSEO({
+    title: '픽셀 드라이빙 - 장애물 피하기',
+    description: '3차선 레트로 감성 픽셀 드라이빙 게임. 장애물을 피하고 코인을 모으며 제한 시간 버티기!',
+    robots: 'index,follow',
+  });
   const [playerLane, setPlayerLane] = useState<Lane>(1);
   const [obstacles, setObstacles] = useState<Obstacle[]>([]);
   const [pickups, setPickups] = useState<Pickup[]>([]);

@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ConsoleWindow } from '../components/ConsoleWindow';
-
 import { Keypad } from '../components/Keypad';
 import { ProgressBar } from '../components/ProgressBar';
 import { FeedbackBadge } from '../components/FeedbackBadge';
@@ -9,9 +8,15 @@ import { useDailyQuizStore } from '../stores/dailyQuiz';
 import { useSettingsStore } from '../stores/settings';
 import { generateDreamGrandfatherQuestions } from '../lib/quiz/dream';
 import { generateSeed, getTodayString } from '../lib/rng';
+import { useSEO } from '../lib/seo/useSEO';
 
 export const GameDream: React.FC = () => {
   const navigate = useNavigate();
+  useSEO({
+    title: '꿈에서 할아버지가... - 기억력+암산 고난도',
+    description: '숫자 기억력과 복잡한 계산이 결합된 고난이도 두뇌 훈련 게임.',
+    robots: 'index,follow',
+  });
   const { questionCount, difficulty } = useSettingsStore();
   const { 
     currentQuestionIndex, 

@@ -10,9 +10,15 @@ import { useDailyQuizStore } from '../stores/dailyQuiz';
 import { generateDollarQuestions, generateDollarRationale } from '../lib/quiz/dollar';
 import { generateSeed, getTodayString } from '../lib/rng';
 import { parseNumber } from '../lib/format';
+import { useSEO } from '../lib/seo/useSEO';
 
 export const GameDollar: React.FC = () => {
   const navigate = useNavigate();
+  useSEO({
+    title: '달러 암산 - 환율 계산 퀴즈',
+    description: '설정한 환율로 달러 금액을 원화로 빠르게 암산하세요. 정답 근거와 천 단위 포맷 지원.',
+    robots: 'index,follow',
+  });
   const { exchangeRate, difficulty, questionCount } = useSettingsStore();
   const { 
     questions, 

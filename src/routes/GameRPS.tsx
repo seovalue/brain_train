@@ -7,6 +7,7 @@ import { useDailyQuizStore } from '../stores/dailyQuiz';
 import { useSettingsStore } from '../stores/settings';
 import { generateRPSQuestion, numberToUserChoice, getRPSResultMessage, RPS_TIMEOUT_MS } from '../lib/quiz/rps';
 import type { RockPaperScissors, Question, RPSPrompt } from '../types';
+import { useSEO } from '../lib/seo/useSEO';
 
 const RPS_ICONS = {
   rock: "✊",
@@ -25,6 +26,11 @@ const TIMEOUT_SECONDS = RPS_TIMEOUT_MS / 1000;
 
 export default function GameRPS() {
   const navigate = useNavigate();
+  useSEO({
+    title: '지시문 가위바위보 - 순발력 훈련',
+    description: '지시문을 보고 2초 내 정답 선택! 시스템 선택도 함께 표기되는 순발력/집중력 게임.',
+    robots: 'index,follow',
+  });
   const { 
     seed, 
     currentQuestionIndex, 
