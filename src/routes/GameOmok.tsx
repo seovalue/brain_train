@@ -129,6 +129,15 @@ function pickCpuMove(board: Stone[][], lastMove: { x: number; y: number } | null
     if (oppWin) return p;
   }
 
+  // 공격 모드 여부 판단: 유저가 한 수로 '치명적 위협(열린4/닫힌4)'을 만들 수 없다면 과감하게 공격
+  const oppCreatesCriticalNext = empties.some((p) =>
+    simulatePlace(board, p.x, p.y, 1, (b) => {
+      const t = analyzeThreatsAt(b, p.x, p.y, 1);
+      return t.openFour2 > 0 || t.openFour1 > 0;
+    })
+  );
+  const attackMode = !oppCreatesCriticalNext;
+
   // 가중치/스코어 함수 정의
   const mid = (BOARD_SIZE - 1) / 2;
 
@@ -137,18 +146,18 @@ function pickCpuMove(board: Stone[][], lastMove: { x: number; y: number } | null
     const myThreat = simulatePlace(board, bx, by, 2, (b) => analyzeThreatsAt(b, bx, by, 2));
     const centerBias = 8 - (Math.abs(bx - mid) + Math.abs(by - mid));
     let score = 0;
-    // 열린4(양쪽/닫힘) 세분화 + 열린3 강화 + 열린2(잠재3)
-    score += oppThreat.openFour2 * 1200 + oppThreat.openFour1 * 900;
-    score += myThreat.openFour2 * 1100 + myThreat.openFour1 * 800;
-    score += oppThreat.openThree2 * 500 + myThreat.openThree2 * 420;
-    score += oppThreat.openTwo2 * 160 + myThreat.openTwo2 * 120;
-    // 포크(복수 위협)
+    // 열린4(양쪽/닫힘) 세분화 + 열린3/2 가중치 재조정(공격 성향)
+    score += oppThreat.openFour2 * 1100 + oppThreat.openFour1 * 760;
+    score += myThreat.openFour2 * 1320 + myThreat.openFour1 * 940;
+    score += oppThreat.openThree2 * 300 + myThreat.openThree2 * 560;
+    score += oppThreat.openTwo2 * 60 + myThreat.openTwo2 * 170;
+    // 포크(복수 위협) — 공격 가산↑, 수비 가산↓
     const oppFork = (oppThreat.openFour2 * 2) + oppThreat.openFour1 + oppThreat.openThree2;
     const myFork = (myThreat.openFour2 * 2) + myThreat.openFour1 + myThreat.openThree2;
-    if (oppFork >= 2) score += 800;
-    if (myFork >= 2) score += 700;
-    // 연속 길이 + 중앙 + 근접
-    score += myThreat.maxLen * 22 + oppThreat.maxLen * 26 + centerBias;
+    if (oppFork >= 2) score += 550;
+    if (myFork >= 2) score += 980;
+    // 연속 길이 + 중앙 + 근접 — 우리 연속 가중 ↑, 상대 ↓
+    score += myThreat.maxLen * 36 + oppThreat.maxLen * 18 + centerBias;
     if (lastMove) {
       const d = Math.abs(bx - lastMove.x) + Math.abs(by - lastMove.y);
       score += Math.max(0, 6 - d);
@@ -166,7 +175,9 @@ function pickCpuMove(board: Stone[][], lastMove: { x: number; y: number } | null
     = topN.filter(({ p }) => {
       const myThr = simulatePlace(board, p.x, p.y, 2, (b) => analyzeThreatsAt(b, p.x, p.y, 2));
       const myFork = (myThr.openFour2 * 2) + myThr.openFour1 + myThr.openThree2;
-      const isAggressive = myThr.openFour2 > 0 || myFork >= 2;
+      const isAggressive = attackMode
+        ? (myThr.openFour2 > 0 || myFork >= 2 || myThr.openThree2 > 0 || myThr.maxLen >= 3)
+        : (myThr.openFour2 > 0 || myFork >= 2);
       if (!isAggressive) return false;
       // 상대 즉시승 응수 있는지 확인
       const after = board.map((r) => r.slice()) as Stone[][];
@@ -189,18 +200,19 @@ function pickCpuMove(board: Stone[][], lastMove: { x: number; y: number } | null
         const thr = simulatePlace(after, qx, qy, 1, (b) => analyzeThreatsAt(b, qx, qy, 1));
         const centerBias = 8 - (Math.abs(qx - mid) + Math.abs(qy - mid));
         let sc = 0;
-        sc += thr.openFour2 * 1150 + thr.openFour1 * 850; // 약간 공격적 튜닝
-        sc += thr.openThree2 * 420;
-        sc += thr.openTwo2 * 140;
-        sc += thr.maxLen * 24 + centerBias;
+        sc += thr.openFour2 * 1050 + thr.openFour1 * 780; // 수비 과대평가 완화
+        sc += thr.openThree2 * 340;
+        sc += thr.openTwo2 * 90;
+        sc += thr.maxLen * 20 + centerBias;
         const fork = (thr.openFour2 * 2) + thr.openFour1 + thr.openThree2;
-        if (fork >= 2) sc += 800;
+        if (fork >= 2) sc += 650;
         return sc;
       };
       const oppScored = empt2.map((q) => ({ q, s: oppScoreAt(q.x, q.y) }));
       oppScored.sort((a, b) => b.s - a.s);
       const worstReply = oppScored.length ? oppScored[0].s : 0;
-      const finalScore = base - 0.85 * worstReply; // 공격 모드 시 약간 완화
+      const lambda = attackMode ? 0.6 : 0.75;
+      const finalScore = base - lambda * worstReply; // 공격 모드: 상대 응수 감산 더 완화
       if (!bestAgg || finalScore > bestAgg.score) bestAgg = { p, score: finalScore };
     }
     if (bestAgg) return bestAgg.p;
@@ -233,22 +245,30 @@ function pickCpuMove(board: Stone[][], lastMove: { x: number; y: number } | null
       if (!best || penalized > best.score) best = { p, score: penalized };
       continue;
     }
+    // 공격 보너스: 막지 않아도 되는 경우 + 공격 모드일 때 우리 위협 가중
+    let aggressiveBonus = 0;
+    if (attackMode) {
+      const myThrAfter = analyzeThreatsAt(after, p.x, p.y, 2);
+      aggressiveBonus += myThrAfter.openFour2 * 220 + myThrAfter.openFour1 * 160;
+      aggressiveBonus += myThrAfter.openThree2 * 180;
+      aggressiveBonus += myThrAfter.maxLen * 14;
+    }
     // 상대 후보 상위 M개만 평가
     const oppScoreAt = (qx: number, qy: number): number => {
       const thr = simulatePlace(after, qx, qy, 1, (b) => analyzeThreatsAt(b, qx, qy, 1));
       const centerBias = 8 - (Math.abs(qx - mid) + Math.abs(qy - mid));
       let sc = 0;
-      sc += thr.openFour2 * 1150 + thr.openFour1 * 850;
-      sc += thr.openThree2 * 420; // 방어 과도성 완화
-      sc += thr.openTwo2 * 140;
-      sc += thr.maxLen * 24 + centerBias;
+      sc += thr.openFour2 * 1000 + thr.openFour1 * 740;
+      sc += thr.openThree2 * 300; // 방어 과도성 추가 완화
+      sc += thr.openTwo2 * 70;
+      sc += thr.maxLen * 18 + centerBias;
       if (lastMove) {
         const d = Math.abs(qx - lastMove.x) + Math.abs(qy - lastMove.y);
         sc += Math.max(0, 5 - d);
       }
       // 복수 위협 가산
       const fork = (thr.openFour2 * 2) + thr.openFour1 + thr.openThree2;
-      if (fork >= 2) sc += 850;
+      if (fork >= 2) sc += 600;
       return sc;
     };
 
@@ -256,8 +276,9 @@ function pickCpuMove(board: Stone[][], lastMove: { x: number; y: number } | null
     oppScored.sort((a, b) => b.s - a.s);
     const topM = oppScored.slice(0, Math.min(10, oppScored.length));
     const worstReply = topM.length ? topM[0].s : 0;
-    // 우리 점수에서 상대 최선 응수의 위협을 감산(람다 0.9)
-    const finalScore = base - 0.9 * worstReply;
+    // 우리 점수에서 상대 최선 응수의 위협을 감산 — 공격 모드에서는 감산 더 낮춤
+    const lambda = attackMode ? 0.65 : 0.8;
+    const finalScore = base + aggressiveBonus - lambda * worstReply;
     if (!best || finalScore > best.score) best = { p, score: finalScore };
   }
 
