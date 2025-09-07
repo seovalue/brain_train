@@ -33,13 +33,20 @@ export const Home: React.FC = () => {
     isNew?: boolean;
   }> = [
     {
+      id: 'driving',
+      icon: '🚗',
+      title: '피해요! 자동차 게임',
+      description: '장애물을 피해서 자동차를 전진!',
+      path: '/game/driving',
+      disabled: false,
+    },
+    {
       id: 'twoInARow',
       icon: '⚾️',
       title: '2연석\n줍줍 ⚾️',
       description: '티켓팅 대비\n2연석 줍줍',
       path: '/game/two-in-a-row',
       disabled: false,
-      isNew: true
     },
     {
       id: 'rps',

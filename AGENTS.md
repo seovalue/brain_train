@@ -42,6 +42,15 @@
 - Static assets live in `public/`; prefer imports in `src/` for hashed builds when possible.
 
 ---
+ 
+## UI Notes – Omok (오목)
+
+- 보드 중앙 정렬: 게임 보드는 수평·수직 모두 중앙 정렬되도록 중간 컨테이너에 `flex-1 flex items-center justify-center`를 사용합니다.
+- 교차점 착점: 돌은 칸이 아닌 격자 선의 교차점에 절대배치로 렌더링합니다. 가장자리 마진은 `cellSize/2`를 사용합니다.
+- 크기/가독성: 기본 13×13, `cellSize=22px`로 355px 화면에서 스크롤 없이 보이며 레트로 톤('#C89F65' 보드, '#452' 격자)을 사용합니다.
+- 접근성: 교차점 버튼은 원형 터치 영역(지름 ≈ `0.8×cellSize`)과 `aria-label`(예: "3, 5 교차점에 두기")을 제공합니다.
+
+---
 
 # desgin guideline
 ---
