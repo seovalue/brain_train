@@ -159,6 +159,51 @@ function pickCpuMove(board: Stone[][], lastMove: { x: number; y: number } | null
   scored.sort((a, b) => b.s - a.s);
   const topN = scored.slice(0, Math.min(14, scored.length));
 
+  // 공격 우선 후보: 우리 열린4 생성 또는 복수 위협 생성이고, 상대 즉시승 응수가 없는 경우
+  const aggressiveCandidates: Array<{ p: { x: number; y: number }; base: number }>
+    = topN.filter(({ p }) => {
+      const myThr = simulatePlace(board, p.x, p.y, 2, (b) => analyzeThreatsAt(b, p.x, p.y, 2));
+      const myFork = (myThr.openFour2 * 2) + myThr.openFour1 + myThr.openThree2;
+      const isAggressive = myThr.openFour2 > 0 || myFork >= 2;
+      if (!isAggressive) return false;
+      // 상대 즉시승 응수 있는지 확인
+      const after = board.map((r) => r.slice()) as Stone[][];
+      after[p.y][p.x] = 2;
+      const empt2 = getAllEmpty(after);
+      for (const q of empt2) {
+        const win = simulatePlace(after, q.x, q.y, 1, (b) => checkWin(b, q.x, q.y, 1));
+        if (win) return false; // 우리의 공격 직후 상대 즉시승 가능 → 제외
+      }
+      return true;
+    }).map(({ p, s }) => ({ p, base: s }));
+
+  if (aggressiveCandidates.length) {
+    let bestAgg: { p: { x: number; y: number }; score: number } | null = null;
+    for (const { p, base } of aggressiveCandidates) {
+      const after = board.map((r) => r.slice()) as Stone[][];
+      after[p.y][p.x] = 2;
+      const empt2 = getAllEmpty(after);
+      const oppScoreAt = (qx: number, qy: number): number => {
+        const thr = simulatePlace(after, qx, qy, 1, (b) => analyzeThreatsAt(b, qx, qy, 1));
+        const centerBias = 8 - (Math.abs(qx - mid) + Math.abs(qy - mid));
+        let sc = 0;
+        sc += thr.openFour2 * 1150 + thr.openFour1 * 850; // 약간 공격적 튜닝
+        sc += thr.openThree2 * 420;
+        sc += thr.openTwo2 * 140;
+        sc += thr.maxLen * 24 + centerBias;
+        const fork = (thr.openFour2 * 2) + thr.openFour1 + thr.openThree2;
+        if (fork >= 2) sc += 800;
+        return sc;
+      };
+      const oppScored = empt2.map((q) => ({ q, s: oppScoreAt(q.x, q.y) }));
+      oppScored.sort((a, b) => b.s - a.s);
+      const worstReply = oppScored.length ? oppScored[0].s : 0;
+      const finalScore = base - 0.85 * worstReply; // 공격 모드 시 약간 완화
+      if (!bestAgg || finalScore > bestAgg.score) bestAgg = { p, score: finalScore };
+    }
+    if (bestAgg) return bestAgg.p;
+  }
+
   // 1-ply 미니맥스: 우리 한 수 → 상대 한 수의 최선 위협을 고려해 평가
   let best: { p: { x: number; y: number }; score: number } | null = null;
   for (const { p, s: base } of topN) {
@@ -191,10 +236,10 @@ function pickCpuMove(board: Stone[][], lastMove: { x: number; y: number } | null
       const thr = simulatePlace(after, qx, qy, 1, (b) => analyzeThreatsAt(b, qx, qy, 1));
       const centerBias = 8 - (Math.abs(qx - mid) + Math.abs(qy - mid));
       let sc = 0;
-      sc += thr.openFour2 * 1200 + thr.openFour1 * 900;
-      sc += thr.openThree2 * 520; // 상대 열린3은 좀 더 위협적으로 봄
-      sc += thr.openTwo2 * 180;
-      sc += thr.maxLen * 28 + centerBias;
+      sc += thr.openFour2 * 1150 + thr.openFour1 * 850;
+      sc += thr.openThree2 * 420; // 방어 과도성 완화
+      sc += thr.openTwo2 * 140;
+      sc += thr.maxLen * 24 + centerBias;
       if (lastMove) {
         const d = Math.abs(qx - lastMove.x) + Math.abs(qy - lastMove.y);
         sc += Math.max(0, 5 - d);
